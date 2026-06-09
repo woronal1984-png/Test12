@@ -234,25 +234,5 @@ void SPI4_IRQHandler(void)
 
 
 
-/**
-  * @brief Обработчик завершения DMA для DCMI
-  * HAL вызовет эту функцию, когда передача данных закончится
-  */
-void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
-    // Устанавливаем флаг, что кадр готов к обработке
-    g_frame_capture_complete = 1;
-    // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
-    // HAL_DCMI_Stop(hdcmi);
-}
-
-/**
-  * @brief Обработчик ошибок DCMI
-  */
-void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
-    // Можно зажечь светодиод ошибки или вывести сообщение в UART
-    // Error handler
-    g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
-}
-
 
 /* USER CODE END 1 */

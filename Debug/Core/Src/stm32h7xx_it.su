@@ -9,5 +9,3 @@
 ../Core/Src/stm32h7xx_it.c:187:6:SysTick_Handler	8	static
 ../Core/Src/stm32h7xx_it.c:208:6:DMA1_Stream0_IRQHandler	8	static
 ../Core/Src/stm32h7xx_it.c:222:6:SPI4_IRQHandler	8	static
-../Core/Src/stm32h7xx_it.c:241:6:HAL_DCMI_FrameEventCallback	16	static
-../Core/Src/stm32h7xx_it.c:251:6:HAL_DCMI_ErrorCallback	16	static

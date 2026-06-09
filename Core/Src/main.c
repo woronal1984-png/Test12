@@ -43,6 +43,9 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
+#define CAMERA_BUFFER_SIZE    (320 * 240)
+uint16_t camera_buffer[CAMERA_BUFFER_SIZE];
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -65,6 +68,47 @@ void PeriphCommonClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+
+void Start_Camera_Capture(void)
+{
+    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
+                       (uint32_t)camera_buffer,
+                       CAMERA_BUFFER_SIZE);
+}
+
+
+/**
+  * @brief Обработчик завершения DMA для DCMI
+  * HAL вызовет эту функцию, когда передача данных закончится
+  */
+void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
+    // Устанавливаем флаг, что кадр готов к обработке
+    g_frame_capture_complete = 1;
+    // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
+    // HAL_DCMI_Stop(hdcmi);
+
+    // Здесь можно обновить дисплей
+      // ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
+
+
+}
+
+
+
+/**
+  * @brief Обработчик ошибок DCMI
+  */
+void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
+    // Можно зажечь светодиод ошибки или вывести сообщение в UART
+    // Error handler
+    g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
+}
+
+
+
+
 
 // Нарисуйте крест и диагональ, чтобы понять ориентацию
 void ST7735_OrientationTest(void) {
@@ -125,28 +169,22 @@ int main(void)
   MX_SPI4_Init();
   /* USER CODE BEGIN 2 */
 
-  // Включить подсветку
-     ST7735_BL_ON();
-
-     // Инициализация дисплея
-     ST7735_Init();
-
-     // Вывод текста
-     ST7735_FillScreen(ST7735_BLACK);
-
-     ST7735_DisplayString(10, 60, "Hello World!", ST7735_WHITE, ST7735_BLACK);
+  // 2. Инициализация дисплея
+      ST7735_BL_ON();
+      ST7735_Init();
+      ST7735_FillScreen(ST7735_BLACK);
+      ST7735_DisplayString(10, 10, "Init display...", ST7735_WHITE, ST7735_BLACK);
 
 
-
-      // 1. Инициализация камеры
-        uint8_t status = OV5640_Init();
-        if (status != 0) {
-            while (1) {
-                HAL_Delay(1000);
-            }
-        } else {
-        	HAL_Delay(1000);
-        }
+      // 4. Инициализация камеры
+      ST7735_DisplayString(10, 30, "Init camera...", ST7735_WHITE, ST7735_BLACK);
+      if (OV5640_Init() != 0) {
+          ST7735_DisplayString(10, 50, "Camera FAIL!", ST7735_WHITE, ST7735_BLACK);
+          Error_Handler();
+      }
+      // 5. Запуск захвата
+      ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
+      Start_Camera_Capture();
 
 
 

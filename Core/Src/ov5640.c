@@ -25,7 +25,7 @@ static void OV5640_Config_RGB565(void); // Наш целевой режим
 extern I2C_HandleTypeDef hi2c1;
 
 
-#define OV5640_ADDR 0x3C
+//#define OV5640_ADDR 0x3C
 
 
 uint8_t OV5640_WriteReg(uint16_t reg, uint8_t data)
@@ -35,7 +35,7 @@ uint8_t OV5640_WriteReg(uint16_t reg, uint8_t data)
     buffer[1] = reg & 0xFF;         // Младший байт адреса
     buffer[2] = data;               // Данные
 
-    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR << 1, buffer, 3, 100);
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR , buffer, 3, 100);
 
     if (status != HAL_OK)
     {
@@ -59,9 +59,9 @@ uint8_t OV5640_ReadReg(uint16_t reg)
     reg_addr[1] = reg & 0xFF;
 
     // Отправляем адрес регистра
-    HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR << 1, reg_addr, 2, 100);
+    HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR, reg_addr, 2, 100);
     // Читаем данные
-    HAL_I2C_Master_Receive(&hi2c1, (OV5640_ADDR << 1) | 1, &data, 1, 100);
+    HAL_I2C_Master_Receive(&hi2c1, OV5640_ADDR, &data, 1, 100);
 
     return data;
 }
@@ -91,7 +91,7 @@ static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data) {
     buf[2] = data;
     // HAL_I2C_Master_Transmit(handle, slave_addr, data, size, timeout)
     // Сдвигаем адрес влево на 1, т.к. HAL ждет 7-битный адрес без бита RW
-    if (HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR >> 1, buf, 3, HAL_MAX_DELAY) != HAL_OK)
+    if (HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR, buf, 3, HAL_MAX_DELAY) != HAL_OK)
         return 1;
     return 0;
 }
@@ -101,9 +101,9 @@ static uint8_t OV5640_ReadRegister(uint16_t reg, uint8_t *data) {
     uint8_t buf[2];
     buf[0] = (reg >> 8) & 0xFF;
     buf[1] = reg & 0xFF;
-    if (HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR >> 1, buf, 2, HAL_MAX_DELAY) != HAL_OK)
+    if (HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR , buf, 2, HAL_MAX_DELAY) != HAL_OK)
         return 1;
-    if (HAL_I2C_Master_Receive(&hi2c1, OV5640_ADDR >> 1, data, 1, HAL_MAX_DELAY) != HAL_OK)
+    if (HAL_I2C_Master_Receive(&hi2c1, OV5640_ADDR , data, 1, HAL_MAX_DELAY) != HAL_OK)
         return 1;
     return 0;
 }

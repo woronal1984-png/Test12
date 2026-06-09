@@ -8,6 +8,7 @@
 
 // Адрес камеры на шине I2C (0x78 для записи / 0x79 для чтения)
 #define OV5640_ADDR    0x78
+//#define OV5640_ADDR    0x3C
 
 // Команды для управления питанием (ваши пины из CubeMX)
 #define OV5640_PWDN_GPIO_Port   GPIOG
