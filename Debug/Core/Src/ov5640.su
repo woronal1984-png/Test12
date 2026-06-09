@@ -1,0 +1,8 @@
+../Core/Src/ov5640.c:25:16:OV5640_WriteRegister	32	static
+../Core/Src/ov5640.c:38:16:OV5640_ReadRegister	32	static
+../Core/Src/ov5640.c:50:9:OV5640_ReadID	24	static
+../Core/Src/ov5640.c:59:13:OV5640_HardReset	8	static
+../Core/Src/ov5640.c:69:9:OV5640_Init	16	static
+../Core/Src/ov5640.c:120:6:OV5640_StartCapture	8	static
+../Core/Src/ov5640.c:128:6:OV5640_StopCapture	8	static
+../Core/Src/ov5640.c:133:13:OV5640_Config_JPEG	4	static
