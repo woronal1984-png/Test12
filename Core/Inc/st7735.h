@@ -49,5 +49,6 @@ void ST7735_FillScreen(uint16_t color);
 void ST7735_DrawPixel(uint8_t x, uint8_t y, uint16_t color);
 void ST7735_DisplayChar(uint8_t x, uint8_t y, char ch, uint16_t color, uint16_t bg);
 void ST7735_DisplayString(uint8_t x, uint8_t y, char* str, uint16_t color, uint16_t bg);
+void ST7735_DrawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t* image);
 
 #endif

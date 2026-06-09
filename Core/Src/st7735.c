@@ -3,6 +3,8 @@
 
 extern SPI_HandleTypeDef hspi4;
 
+
+
 // ========== ТАБЛИЦА ШРИФТА 5x7 ==========
 static const uint8_t Font5x7[][5] = {
     {0x00, 0x00, 0x00, 0x00, 0x00}, // Пробел
@@ -359,4 +361,12 @@ void ST7735_DisplayString(uint8_t x, uint8_t y, char* str, uint16_t color, uint1
     }
 }
 
+
+void ST7735_DrawImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint16_t* image) {
+    for (uint16_t i = 0; i < height; i++) {
+        for (uint16_t j = 0; j < width; j++) {
+            ST7735_DrawPixel(x + j, y + i, image[i * width + j]);
+        }
+    }
+}
 

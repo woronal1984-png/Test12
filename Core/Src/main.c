@@ -57,6 +57,8 @@ uint16_t camera_buffer[CAMERA_BUFFER_SIZE];
 
 /* USER CODE BEGIN PV */
 
+volatile uint8_t g_frame_capture_complete = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -92,6 +94,15 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Здесь можно обновить дисплей
       // ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
+    static uint32_t frame_count = 0;
+    frame_count++;
+
+    // Временная индикация на дисплее (например, счётчик кадров)
+    char str[32];
+    sprintf(str, "Frames: %lu", frame_count);
+    ST7735_DisplayString(10, 210, str, ST7735_YELLOW, ST7735_BLACK);
+
+    ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
 }
 
@@ -110,23 +121,22 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 
 
 
-// Нарисуйте крест и диагональ, чтобы понять ориентацию
-void ST7735_OrientationTest(void) {
-    ST7735_FillScreen(ST7735_BLACK);
-
-    // Горизонтальная линия (должна идти слева направо)
-    for (uint8_t x = 0; x < ST7735_WIDTH; x++) {
-        ST7735_DrawPixel(x, ST7735_HEIGHT / 2, ST7735_RED);
+// Добавим DMA callback для отладки
+void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi) {
+    // Этот коллбэк вызывается на каждую строку
+    static uint16_t line_count = 0;
+    line_count++;
+    if (line_count >= 240) {
+        line_count = 0;
+//        g_frame_capture_complete = 1; // Кадр готов после 240 строк
     }
-
-    // Вертикальная линия (должна идти сверху вниз)
-    for (uint8_t y = 0; y < ST7735_HEIGHT; y++) {
-        ST7735_DrawPixel(ST7735_WIDTH / 2, y, ST7735_GREEN);
-    }
-
-    // Текст (должен быть горизонтальным)
-    ST7735_DisplayString(10, 10, "ABCDEF", ST7735_WHITE, ST7735_BLACK);
 }
+
+
+
+
+
+
 
 /* USER CODE END 0 */
 
@@ -184,6 +194,22 @@ int main(void)
       }
       // 5. Запуск захвата
       ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
+
+
+
+
+      // Регистрируем оба коллбэка
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_FRAME_EVENT_CB_ID, HAL_DCMI_FrameEventCallback);
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_LINE_EVENT_CB_ID, HAL_DCMI_LineEventCallback);
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_ERROR_CB_ID, HAL_DCMI_ErrorCallback);
+
+      // Включаем прерывания по линиям
+      __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
+      __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);  // На всякий случай
+
+
+
+
       Start_Camera_Capture();
 
 
@@ -198,7 +224,32 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+	    if (g_frame_capture_complete) {
+	        g_frame_capture_complete = 0;
+
+	        // Обновить дисплей
+	        ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
+
+	        // Небольшая задержка для визуального восприятия
+	        HAL_Delay(50);
+
+	        // Перезапустить захват, если он остановился
+	        // HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
+	        //                    (uint32_t)camera_buffer,
+	        //                    CAMERA_BUFFER_SIZE);
+	    }
+
+
   }
+
+
+
+
+
+
+
+
   /* USER CODE END 3 */
 }
 

@@ -13,7 +13,7 @@
 
 // Глобальные переменные
 uint8_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((section(".dtcmram")));
-volatile uint8_t g_frame_capture_complete = 0;
+
 
 // Прототипы
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data);
