@@ -4,6 +4,7 @@
 
 #include "main.h"
 #include <stdint.h>
+#include "ov5640_regs.h"
 
 // Адрес камеры на шине I2C (0x78 для записи / 0x79 для чтения)
 #define OV5640_ADDR    0x78
@@ -22,7 +23,7 @@
 // Буфер для хранения кадра (используем D2 или D3 домен SRAM для H7)
 extern uint8_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((section(".dtcmram")));
 extern volatile uint8_t g_frame_capture_complete;
-
+extern const uint8_t ov5640_default_regs[][3];
 
 
 // Функции драйвера
@@ -30,5 +31,10 @@ uint8_t OV5640_Init(void);
 uint8_t OV5640_ReadID(uint16_t *DeviceID);
 void OV5640_StartCapture(void);
 void OV5640_StopCapture(void);
+
+uint8_t OV5640_WriteReg(uint16_t reg, uint8_t data);
+uint8_t OV5640_ReadReg(uint16_t reg);
+uint16_t OV5640_ReadID1(void);
+
 
 #endif

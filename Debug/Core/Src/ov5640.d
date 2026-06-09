@@ -33,7 +33,7 @@ Core/Src/ov5640.o: ../Core/Src/ov5640.c ../Core/Inc/ov5640.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rtc_ex.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h \
  ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h \
- ../Core/Inc/dcmi.h ../Core/Inc/i2c.h
+ ../Core/Inc/ov5640_regs.h ../Core/Inc/dcmi.h ../Core/Inc/i2c.h
 ../Core/Inc/ov5640.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal.h:
@@ -70,5 +70,6 @@ Core/Src/ov5640.o: ../Core/Src/ov5640.c ../Core/Inc/ov5640.h \
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_rtc_ex.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h:
 ../Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi_ex.h:
+../Core/Inc/ov5640_regs.h:
 ../Core/Inc/dcmi.h:
 ../Core/Inc/i2c.h:

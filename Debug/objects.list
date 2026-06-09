@@ -4,6 +4,7 @@
 "./Core/Src/i2c.o"
 "./Core/Src/main.o"
 "./Core/Src/ov5640.o"
+"./Core/Src/ov5640_regs.o"
 "./Core/Src/rtc.o"
 "./Core/Src/spi.o"
 "./Core/Src/st7735.o"

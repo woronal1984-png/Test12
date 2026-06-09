@@ -21,6 +21,68 @@ static uint8_t OV5640_ReadRegister(uint16_t reg, uint8_t *data);
 static void OV5640_Config_JPEG(void); // Для продвинутого режима
 static void OV5640_Config_RGB565(void); // Наш целевой режим
 
+
+extern I2C_HandleTypeDef hi2c1;
+
+
+#define OV5640_ADDR 0x3C
+
+
+uint8_t OV5640_WriteReg(uint16_t reg, uint8_t data)
+{
+    uint8_t buffer[3];
+    buffer[0] = (reg >> 8) & 0xFF;  // Старший байт адреса
+    buffer[1] = reg & 0xFF;         // Младший байт адреса
+    buffer[2] = data;               // Данные
+
+    HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR << 1, buffer, 3, 100);
+
+    if (status != HAL_OK)
+    {
+        // Обработка ошибки
+        return 1;
+    }
+    return 0;
+}
+
+/**
+  * @brief  Чтение байта из регистра OV5640
+  * @param  reg: 16-битный адрес регистра
+  * @retval Прочитанное значение
+  */
+uint8_t OV5640_ReadReg(uint16_t reg)
+{
+    uint8_t reg_addr[2];
+    uint8_t data = 0;
+
+    reg_addr[0] = (reg >> 8) & 0xFF;
+    reg_addr[1] = reg & 0xFF;
+
+    // Отправляем адрес регистра
+    HAL_I2C_Master_Transmit(&hi2c1, OV5640_ADDR << 1, reg_addr, 2, 100);
+    // Читаем данные
+    HAL_I2C_Master_Receive(&hi2c1, (OV5640_ADDR << 1) | 1, &data, 1, 100);
+
+    return data;
+}
+
+/**
+  * @brief  Чтение ID камеры
+  * @retval ID камеры (должно быть 0x5640)
+  */
+uint16_t OV5640_ReadID1(void)
+{
+    uint16_t pid = 0;
+    pid = OV5640_ReadReg(0x300A);
+    pid = (pid << 8) | OV5640_ReadReg(0x300B);
+    return pid;
+}
+
+
+
+
+
+
 // Функция записи в регистр (эмуляция SCCB через I2C)
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data) {
     uint8_t buf[3];
@@ -69,7 +131,16 @@ static void OV5640_HardReset(void) {
 uint8_t OV5640_Init(void) {
     uint16_t id = 0;
 
-    OV5640_HardReset();
+    // OV5640_HardReset();
+
+
+
+
+ // 2. Проверка ID камеры (должно быть 0x5640)
+    uint16_t pid = 0;
+    pid = OV5640_ReadReg(0x300A); // Читаем старший байт PID
+    pid = (pid << 8) | OV5640_ReadReg(0x300B);
+    if (pid != 0x5640) return 1; // Ошибка: камера не отвечает
 
     // Задержка для стабилизации питания
     HAL_Delay(20);
@@ -82,6 +153,15 @@ uint8_t OV5640_Init(void) {
     if (id != 0x5640) {
         return 2; // Неверный ID (возможно, другая камера)
     }
+
+
+    for (i = 0; i < sizeof(ov5640_default_regs) / sizeof(ov5640_default_regs[0]); i++)
+        {
+            OV5640_WriteReg(ov5640_default_regs[i][0], ov5640_default_regs[i][1]);
+            // Можно добавить небольшую задержку для некоторых регистров
+        }
+
+    /*
 
     // 1. Программный сброс через регистр
     OV5640_WriteRegister(0x3008, 0x82);
@@ -112,7 +192,7 @@ uint8_t OV5640_Init(void) {
 
     // Настройка DMA/DCMI на стороне микроконтроллера выполняются в основном файле,
     // здесь мы лишь говорим камере "начать вещание".
-
+*/
     return 0;
 }
 
