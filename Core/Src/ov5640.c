@@ -145,6 +145,16 @@ uint8_t OV5640_Init(void) {
     // Задержка для стабилизации питания
     HAL_Delay(20);
 
+
+    uint32_t i;
+    for ( i = 0; i < ov5640_default_regs_size; i++)
+        {
+        	OV5640_WriteReg(ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1],
+                        ov5640_default_regs[i][2]);
+            // Можно добавить небольшую задержку для некоторых регистров
+        	HAL_Delay(2);
+        }
+
     // Проверяем ID. Если чтение не удалось (HAL_BUSY или ошибка) — камера не отвечает.
     if (OV5640_ReadID(&id) != 0) {
         return 1; // Ошибка I2C
@@ -153,13 +163,6 @@ uint8_t OV5640_Init(void) {
     if (id != 0x5640) {
         return 2; // Неверный ID (возможно, другая камера)
     }
-
-
-    for (i = 0; i < sizeof(ov5640_default_regs) / sizeof(ov5640_default_regs[0]); i++)
-        {
-            OV5640_WriteReg(ov5640_default_regs[i][0], ov5640_default_regs[i][1]);
-            // Можно добавить небольшую задержку для некоторых регистров
-        }
 
     /*
 

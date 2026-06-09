@@ -295,3 +295,6 @@ const uint8_t ov5640_default_regs[][3] = {
     // End.
 
     {0x00, 0x00, 0x00}};
+
+
+const uint32_t ov5640_default_regs_size = sizeof(ov5640_default_regs) / sizeof(ov5640_default_regs[0]);

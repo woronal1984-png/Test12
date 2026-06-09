@@ -123,5 +123,8 @@
 #define PRE_ISP_TEST        0x503D
 
 extern const uint8_t ov5640_default_regs[][3];
+extern const uint32_t ov5640_default_regs_size;
+
+
 
 #endif //__REG_REGS_H__
