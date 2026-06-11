@@ -17,15 +17,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   6 .data         00000060  24000000  0800cccc  0000e000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  7 .bss          00025b58  24000060  0800cd2c  0000e060  2**2
+  7 .bss          0000a358  24000060  0800cd2c  0000e060  2**2
                   ALLOC
-  8 ._user_heap_stack 00000600  24025bb8  0800cd2c  0000ebb8  2**0
+  8 ._user_heap_stack 00000600  2400a3b8  0800cd2c  0000e3b8  2**0
                   ALLOC
   9 .ARM.attributes 0000002e  00000000  00000000  0000e060  2**0
                   CONTENTS, READONLY
- 10 .debug_info   0001814f  00000000  00000000  0000e08e  2**0
+ 10 .debug_info   0001814d  00000000  00000000  0000e08e  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 11 .debug_abbrev 00003903  00000000  00000000  000261dd  2**0
+ 11 .debug_abbrev 00003903  00000000  00000000  000261db  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  12 .debug_aranges 00001080  00000000  00000000  00029ae0  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
@@ -998,7 +998,7 @@ void Start_Camera_Capture(void)
     // Запуск DMA в циклическом режиме
     if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
  8000930:	4a11      	ldr	r2, [pc, #68]	@ (8000978 <Start_Camera_Capture+0x54>)
- 8000932:	f44f 3396 	mov.w	r3, #76800	@ 0x12c00
+ 8000932:	f44f 43a0 	mov.w	r3, #20480	@ 0x5000
  8000936:	2100      	movs	r1, #0
  8000938:	4810      	ldr	r0, [pc, #64]	@ (800097c <Start_Camera_Capture+0x58>)
  800093a:	f001 fc3b 	bl	80021b4 <HAL_DCMI_Start_DMA>
@@ -1034,7 +1034,7 @@ void Start_Camera_Capture(void)
  800096e:	46bd      	mov	sp, r7
  8000970:	bd80      	pop	{r7, pc}
  8000972:	bf00      	nop
- 8000974:	240259b0 	.word	0x240259b0
+ 8000974:	2400a1b0 	.word	0x2400a1b0
  8000978:	240001b0 	.word	0x240001b0
  800097c:	2400007c 	.word	0x2400007c
  8000980:	0800c6c8 	.word	0x0800c6c8
@@ -1101,8 +1101,8 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
  80009da:	46bd      	mov	sp, r7
  80009dc:	bd80      	pop	{r7, pc}
  80009de:	bf00      	nop
- 80009e0:	240259b0 	.word	0x240259b0
- 80009e4:	240259b4 	.word	0x240259b4
+ 80009e0:	2400a1b0 	.word	0x2400a1b0
+ 80009e4:	2400a1b4 	.word	0x2400a1b4
  80009e8:	0800c6ec 	.word	0x0800c6ec
  80009ec:	240001b0 	.word	0x240001b0
 
@@ -1130,7 +1130,7 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
  8000a04:	f85d 7b04 	ldr.w	r7, [sp], #4
  8000a08:	4770      	bx	lr
  8000a0a:	bf00      	nop
- 8000a0c:	240259b0 	.word	0x240259b0
+ 8000a0c:	2400a1b0 	.word	0x2400a1b0
 
 08000a10 <HAL_DCMI_LineEventCallback>:
 
@@ -1170,7 +1170,7 @@ void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi) {
  8000a38:	f85d 7b04 	ldr.w	r7, [sp], #4
  8000a3c:	4770      	bx	lr
  8000a3e:	bf00      	nop
- 8000a40:	240259b8 	.word	0x240259b8
+ 8000a40:	2400a1b8 	.word	0x2400a1b8
 
 08000a44 <main>:
 /**
@@ -1352,7 +1352,7 @@ int main(void)
  8000b4c:	2400007c 	.word	0x2400007c
  8000b50:	08000a11 	.word	0x08000a11
  8000b54:	080009f1 	.word	0x080009f1
- 8000b58:	240259b0 	.word	0x240259b0
+ 8000b58:	2400a1b0 	.word	0x2400a1b0
 
 08000b5c <SystemClock_Config>:
 /**
@@ -2156,7 +2156,7 @@ void MX_RTC_Init(void)
  8000fe2:	3718      	adds	r7, #24
  8000fe4:	46bd      	mov	sp, r7
  8000fe6:	bd80      	pop	{r7, pc}
- 8000fe8:	240259bc 	.word	0x240259bc
+ 8000fe8:	2400a1bc 	.word	0x2400a1bc
  8000fec:	58004000 	.word	0x58004000
 
 08000ff0 <HAL_RTC_MspInit>:
@@ -2343,7 +2343,7 @@ void MX_SPI4_Init(void)
  80010f6:	bf00      	nop
  80010f8:	bd80      	pop	{r7, pc}
  80010fa:	bf00      	nop
- 80010fc:	240259e0 	.word	0x240259e0
+ 80010fc:	2400a1e0 	.word	0x2400a1e0
  8001100:	40013400 	.word	0x40013400
 
 08001104 <HAL_SPI_MspInit>:
@@ -2509,7 +2509,7 @@ void ST7735_SendCommand(uint8_t cmd) {
  8001224:	46bd      	mov	sp, r7
  8001226:	bd80      	pop	{r7, pc}
  8001228:	58021000 	.word	0x58021000
- 800122c:	240259e0 	.word	0x240259e0
+ 800122c:	2400a1e0 	.word	0x2400a1e0
 
 08001230 <ST7735_SendData>:
 
@@ -2547,7 +2547,7 @@ void ST7735_SendData(uint8_t data) {
  8001270:	46bd      	mov	sp, r7
  8001272:	bd80      	pop	{r7, pc}
  8001274:	58021000 	.word	0x58021000
- 8001278:	240259e0 	.word	0x240259e0
+ 8001278:	2400a1e0 	.word	0x2400a1e0
 
 0800127c <ST7735_SendDataArray>:
 
@@ -2587,7 +2587,7 @@ static void ST7735_SendDataArray(uint8_t* data, uint16_t len) {
  80012c0:	bd80      	pop	{r7, pc}
  80012c2:	bf00      	nop
  80012c4:	58021000 	.word	0x58021000
- 80012c8:	240259e0 	.word	0x240259e0
+ 80012c8:	2400a1e0 	.word	0x2400a1e0
 
 080012cc <ST7735_Init>:
 
@@ -3067,7 +3067,7 @@ void ST7735_FillScreen(uint16_t color) {
  80015ec:	46bd      	mov	sp, r7
  80015ee:	bd80      	pop	{r7, pc}
  80015f0:	58021000 	.word	0x58021000
- 80015f4:	240259e0 	.word	0x240259e0
+ 80015f4:	2400a1e0 	.word	0x2400a1e0
 
 080015f8 <ST7735_DrawPixel>:
 
@@ -3729,7 +3729,7 @@ void SPI4_IRQHandler(void)
  80018fe:	bf00      	nop
  8001900:	bd80      	pop	{r7, pc}
  8001902:	bf00      	nop
- 8001904:	240259e0 	.word	0x240259e0
+ 8001904:	2400a1e0 	.word	0x2400a1e0
 
 08001908 <_sbrk>:
  *
@@ -3809,8 +3809,8 @@ void *_sbrk(ptrdiff_t incr)
  8001962:	bd80      	pop	{r7, pc}
  8001964:	24080000 	.word	0x24080000
  8001968:	00000400 	.word	0x00000400
- 800196c:	24025a68 	.word	0x24025a68
- 8001970:	24025bb8 	.word	0x24025bb8
+ 800196c:	2400a268 	.word	0x2400a268
+ 8001970:	2400a3b8 	.word	0x2400a3b8
 
 08001974 <SystemInit>:
   *         configuration.
@@ -4173,7 +4173,7 @@ LoopForever:
   ldr r2, =_sbss
  8001b18:	24000060 	.word	0x24000060
   ldr r4, =_ebss
- 8001b1c:	24025bb8 	.word	0x24025bb8
+ 8001b1c:	2400a3b8 	.word	0x2400a3b8
 
 08001b20 <ADC3_IRQHandler>:
  * @retval None
@@ -4378,7 +4378,7 @@ __weak void HAL_IncTick(void)
  8001c24:	4770      	bx	lr
  8001c26:	bf00      	nop
  8001c28:	2400000c 	.word	0x2400000c
- 8001c2c:	24025a6c 	.word	0x24025a6c
+ 8001c2c:	2400a26c 	.word	0x2400a26c
 
 08001c30 <HAL_GetTick>:
   * @note This function is declared as __weak to be overwritten in case of other
@@ -4398,7 +4398,7 @@ __weak uint32_t HAL_GetTick(void)
  8001c3c:	f85d 7b04 	ldr.w	r7, [sp], #4
  8001c40:	4770      	bx	lr
  8001c42:	bf00      	nop
- 8001c44:	24025a6c 	.word	0x24025a6c
+ 8001c44:	2400a26c 	.word	0x2400a26c
 
 08001c48 <HAL_Delay>:
   *       implementations in user file.
@@ -28290,7 +28290,7 @@ static uint32_t SPI_GetPacketSize(const SPI_HandleTypeDef *hspi)
  800be76:	e7ca      	b.n	800be0e <_free_r+0x22>
  800be78:	bd38      	pop	{r3, r4, r5, pc}
  800be7a:	bf00      	nop
- 800be7c:	24025bb4 	.word	0x24025bb4
+ 800be7c:	2400a3b4 	.word	0x2400a3b4
 
 0800be80 <sbrk_aligned>:
  800be80:	b570      	push	{r4, r5, r6, lr}
@@ -28320,7 +28320,7 @@ static uint32_t SPI_GetPacketSize(const SPI_HandleTypeDef *hspi)
  800beba:	d1f2      	bne.n	800bea2 <sbrk_aligned+0x22>
  800bebc:	e7ef      	b.n	800be9e <sbrk_aligned+0x1e>
  800bebe:	bf00      	nop
- 800bec0:	24025bb0 	.word	0x24025bb0
+ 800bec0:	2400a3b0 	.word	0x2400a3b0
 
 0800bec4 <_malloc_r>:
  800bec4:	e92d 43f8 	stmdb	sp!, {r3, r4, r5, r6, r7, r8, r9, lr}
@@ -28430,19 +28430,19 @@ static uint32_t SPI_GetPacketSize(const SPI_HandleTypeDef *hspi)
  800bfba:	6005      	str	r5, [r0, #0]
  800bfbc:	e7d6      	b.n	800bf6c <_malloc_r+0xa8>
  800bfbe:	bf00      	nop
- 800bfc0:	24025bb4 	.word	0x24025bb4
+ 800bfc0:	2400a3b4 	.word	0x2400a3b4
 
 0800bfc4 <__malloc_lock>:
  800bfc4:	4801      	ldr	r0, [pc, #4]	@ (800bfcc <__malloc_lock+0x8>)
  800bfc6:	f7ff bf0f 	b.w	800bde8 <__retarget_lock_acquire_recursive>
  800bfca:	bf00      	nop
- 800bfcc:	24025bac 	.word	0x24025bac
+ 800bfcc:	2400a3ac 	.word	0x2400a3ac
 
 0800bfd0 <__malloc_unlock>:
  800bfd0:	4801      	ldr	r0, [pc, #4]	@ (800bfd8 <__malloc_unlock+0x8>)
  800bfd2:	f7ff bf0a 	b.w	800bdea <__retarget_lock_release_recursive>
  800bfd6:	bf00      	nop
- 800bfd8:	24025bac 	.word	0x24025bac
+ 800bfd8:	2400a3ac 	.word	0x2400a3ac
 
 0800bfdc <__ssputs_r>:
  800bfdc:	e92d 47f0 	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
@@ -29100,7 +29100,7 @@ static uint32_t SPI_GetPacketSize(const SPI_HandleTypeDef *hspi)
  800c5fe:	b103      	cbz	r3, 800c602 <_sbrk_r+0x1a>
  800c600:	6023      	str	r3, [r4, #0]
  800c602:	bd38      	pop	{r3, r4, r5, pc}
- 800c604:	24025ba8 	.word	0x24025ba8
+ 800c604:	2400a3a8 	.word	0x2400a3a8
 
 0800c608 <memcpy>:
  800c608:	440a      	add	r2, r1

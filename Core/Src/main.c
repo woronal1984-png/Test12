@@ -43,7 +43,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define CAMERA_BUFFER_SIZE    (320 * 240)
+#define CAMERA_BUFFER_SIZE    (160 * 128)
 uint16_t camera_buffer[CAMERA_BUFFER_SIZE];
 
 /* USER CODE END PD */
