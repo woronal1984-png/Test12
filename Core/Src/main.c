@@ -75,9 +75,21 @@ void PeriphCommonClock_Config(void);
 
 void Start_Camera_Capture(void)
 {
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
-                       (uint32_t)camera_buffer,
-                       CAMERA_BUFFER_SIZE);
+
+    // Сброс флагов
+    g_frame_capture_complete = 0;
+
+    // Запуск DMA в циклическом режиме
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
+                         (uint32_t)camera_buffer,
+                         CAMERA_BUFFER_SIZE) != HAL_OK)
+    {
+        ST7735_DisplayString(10, 90, "DCMI Start FAIL!", ST7735_RED, ST7735_BLACK);
+        Error_Handler();
+    }
+
+    ST7735_DisplayString(10, 90, "DCMI Started OK", ST7735_GREEN, ST7735_BLACK);
+
 }
 
 
@@ -100,7 +112,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Временная индикация на дисплее (например, счётчик кадров)
     char str[32];
     sprintf(str, "Frames: %lu", frame_count);
-    ST7735_DisplayString(10, 210, str, ST7735_YELLOW, ST7735_BLACK);
+    ST7735_DisplayString(10, 10, str,  ST7735_WHITE, ST7735_BLACK);
 
     ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
@@ -229,7 +241,7 @@ int main(void)
 	        g_frame_capture_complete = 0;
 
 	        // Обновить дисплей
-	        ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
+//	        ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
 	        // Небольшая задержка для визуального восприятия
 	        HAL_Delay(50);
