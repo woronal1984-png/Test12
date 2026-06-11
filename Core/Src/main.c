@@ -207,6 +207,14 @@ int main(void)
       // 5. Запуск захвата
       ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
 
+      uint8_t pid_high = OV5640_ReadReg(0x300A);
+      uint8_t pid_low  = OV5640_ReadReg(0x300B);
+      uint16_t camera_id = (pid_high << 8) | pid_low;
+
+      // Включение тестового паттерна (цветные полосы)
+      OV5640_WriteReg(0x503D, 0x80);  // Включение тестового режима
+      OV5640_WriteReg(0x503E, 0x00);  // Цветная полоса
+      OV5640_WriteReg(0x503C, 0x02);  // Вертикальные цветные полосы
 
 
       Start_Camera_Capture();
