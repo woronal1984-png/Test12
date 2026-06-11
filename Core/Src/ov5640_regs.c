@@ -2,7 +2,6 @@
 
 const uint8_t ov5640_default_regs[][3] = {
 		   // Системные настройки
-
 		{0x47, 0x40, 0x21}, //  POLARITY CTRL00  0x21 -> VSYNC на Active High
 
 		{0x31, 0x03, 0x11},  // SCCB System Control
@@ -16,7 +15,7 @@ const uint8_t ov5640_default_regs[][3] = {
 	    {0x30, 0x2c, 0x02},
 		{0x30, 0x2d, 0x60},
 	    {0x30, 0x34, 0x1a},  //  PLL Bit Divider
-	    {0x30, 0x35, 0x11}, // { 0x30, 0x35, 0x21 },  //  PLL System Clock Divider
+	    {0x30, 0x35, 0x21}, // { 0x30, 0x35, 0x21 },  //  PLL System Clock Divider
 	    {0x30, 0x36, 0x64}, // { 0x30, 0x36, 0x46 },  //  PLL Multiplier
 	    {0x30, 0x37, 0x13}, // PLL Pre-divider
 	    {0x30, 0x38, 0x00},  // RFU - Reserved for Future Use
@@ -82,8 +81,8 @@ const uint8_t ov5640_default_regs[][3] = {
 	    {0x50, 0x25, 0x00},
 
 		// Регистры для включения формата RGB565
-		{0x50, 0x1F, 0x01}, // Выбор цветового пространства RGB [citation:1][citation:10]
-		{0x43, 0x00, 0x61}, // Выбор формата RGB565 и порядка байтов [citation:1]
+		{0x50, 0x1F, 0x00}, // Выбор цветового пространства RGB [citation:1][citation:10]
+		{0x43, 0x00, 0x30}, // Выбор формата RGB565 и порядка байтов [citation:1]
 
 		{0x50, 0x01, 0xA3}, // Включение ISP и шумоподавления
 		{0x35, 0x03, 0x00}, // Отключение ручного управления усилением
