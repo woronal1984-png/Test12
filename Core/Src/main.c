@@ -209,19 +209,6 @@ int main(void)
 
 
 
-
-      // Регистрируем оба коллбэка
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_FRAME_EVENT_CB_ID, HAL_DCMI_FrameEventCallback);
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_LINE_EVENT_CB_ID, HAL_DCMI_LineEventCallback);
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_ERROR_CB_ID, HAL_DCMI_ErrorCallback);
-
-      // Включаем прерывания по линиям
-      __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
-      __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);  // На всякий случай
-
-
-
-
       Start_Camera_Capture();
 
 

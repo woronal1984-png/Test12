@@ -33,6 +33,12 @@ void MX_DCMI_Init(void)
 
   /* USER CODE BEGIN DCMI_Init 0 */
 
+    // Регистрируем оба коллбэка
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_FRAME_EVENT_CB_ID, HAL_DCMI_FrameEventCallback);
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_LINE_EVENT_CB_ID, HAL_DCMI_LineEventCallback);
+      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_ERROR_CB_ID, HAL_DCMI_ErrorCallback);
+
+
   /* USER CODE END DCMI_Init 0 */
 
   /* USER CODE BEGIN DCMI_Init 1 */
@@ -56,6 +62,10 @@ void MX_DCMI_Init(void)
   }
   /* USER CODE BEGIN DCMI_Init 2 */
 
+  // 6. Включаем прерывания ПОСЛЕ инициализации
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_ERR);
   /* USER CODE END DCMI_Init 2 */
 
 }
