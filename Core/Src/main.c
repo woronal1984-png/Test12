@@ -282,8 +282,7 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
-  __HAL_RCC_PLLCLKOUT_ENABLE(RCC_PLL1_DIVQ);
-  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_PLL1QCLK, RCC_MCODIV_10);
+  HAL_RCC_MCOConfig(RCC_MCO1, RCC_MCO1SOURCE_HSE, RCC_MCODIV_1);
 }
 
 /**
