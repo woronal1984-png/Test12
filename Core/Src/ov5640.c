@@ -12,7 +12,7 @@
 #include "i2c.h"    // HAL I2C драйвер
 
 // Глобальные переменные
-uint8_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((section(".dtcmram")));
+uint16_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((aligned(32)));
 
 
 // Прототипы
@@ -131,11 +131,6 @@ static void OV5640_HardReset(void) {
 uint8_t OV5640_Init(void) {
     uint16_t id = 0;
 
-    // OV5640_HardReset();
-
-
-
-
  // 2. Проверка ID камеры (должно быть 0x5640)
     uint16_t pid = 0;
     pid = OV5640_ReadReg(0x300A); // Читаем старший байт PID
@@ -156,11 +151,7 @@ uint8_t OV5640_Init(void) {
         }
 
 
-    	HAL_Delay(100);
-
-    	// Оставляем камеру в режиме 1280x960, но берем каждый 4-й пиксель
-    	OV5640_WriteReg(0x3814, 0x41);  // X_INC = 4 (шаг по горизонтали)
-    	OV5640_WriteReg(0x3815, 0x41);  // Y_INC = 4 (шаг по вертикали)
+    HAL_Delay(100);
 
     // Проверяем ID. Если чтение не удалось (HAL_BUSY или ошибка) — камера не отвечает.
     if (OV5640_ReadID(&id) != 0) {
@@ -171,47 +162,15 @@ uint8_t OV5640_Init(void) {
         return 2; // Неверный ID (возможно, другая камера)
     }
 
-    /*
-
-    // 1. Программный сброс через регистр
-    OV5640_WriteRegister(0x3008, 0x82);
-    HAL_Delay(100);
-
-    // 2. Настройка тактирования (включение PLL для работы от 24 МГц)
-    OV5640_WriteRegister(0x3034, 0x1A); // PLL config
-    OV5640_WriteRegister(0x3035, 0x21); // PLL config
-    OV5640_WriteRegister(0x3036, 0x46); // PLL config
-    OV5640_WriteRegister(0x3037, 0x03); // PLL config
-
-    // 3. Настройка разрешения (VGA) и формата (RGB565) - критические настройки!
-    //    Обратите внимание: OV5640 имеет огромное количество регистров.
-    //    Полный массив инициализации (около 100-200 строк) опущен для краткости.
-    //    Однако ключевые:
-    OV5640_WriteRegister(0x3035, 0x41); // PLL multiply
-    OV5640_WriteRegister(0x3C07, 0x08); // Light mode = 60Hz
-
-    // Выбор формата вывода: RGB565
-    OV5640_WriteRegister(0x4300, 0x61); // Output format control 1 (RGB565)
-    OV5640_WriteRegister(0x501F, 0x01); // ISP: RGB format
-
-    // Настройка окна вывода (640x480)
-    OV5640_WriteRegister(0x3800, 0x00); OV5640_WriteRegister(0x3801, 0x00); // X start
-    OV5640_WriteRegister(0x3802, 0x00); OV5640_WriteRegister(0x3803, 0x00); // Y start
-    OV5640_WriteRegister(0x3804, 0x02); OV5640_WriteRegister(0x3805, 0x7F); // X end (639)
-    OV5640_WriteRegister(0x3806, 0x01); OV5640_WriteRegister(0x3807, 0xDF); // Y end (479)
-
-    // Настройка DMA/DCMI на стороне микроконтроллера выполняются в основном файле,
-    // здесь мы лишь говорим камере "начать вещание".
-*/
     return 0;
 }
 
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
     g_frame_capture_complete = 0;
-    // Запуск DCMI в режиме одиночного снимка (Snapshot)
+    // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 4);
+    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 4);
     // Примечание: размер считается в 32-битных словах (раз / 4), т.к. Word = 4 байта.
 }
 
