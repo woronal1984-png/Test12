@@ -168,10 +168,10 @@ uint8_t OV5640_Init(void) {
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
     g_frame_capture_complete = 0;
-    // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT
+    // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 2);
-    // Примечание: размер считается в 32-битных словах (раз / 4), т.к. Word = 4 байта.
+    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 2);
+
 }
 
 void OV5640_StopCapture(void) {
