@@ -12,8 +12,7 @@
 #include "i2c.h"    // HAL I2C драйвер
 
 // Глобальные переменные
-uint16_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((aligned(32)));
-
+uint16_t g_camera_frame[IMAGE_PIXELS] __attribute__((aligned(32)));
 
 // Прототипы
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data);
@@ -162,6 +161,12 @@ uint8_t OV5640_Init(void) {
         return 2; // Неверный ID (возможно, другая камера)
     }
 
+
+    // Должно быть 0x61 для RGB565 little-endian
+	if ( OV5640_ReadReg(0x4300) != 0x61) {
+		return 3; //Wrong format!
+	}
+
     return 0;
 }
 
@@ -170,7 +175,7 @@ void OV5640_StartCapture(void) {
     g_frame_capture_complete = 0;
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 2);
+    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS);
 
 }
 
