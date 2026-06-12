@@ -89,7 +89,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Временная индикация на дисплее (например, счётчик кадров)
     char str[32];
     sprintf(str, "Frames: %lu", frame_count);
-    ST7735_DisplayString(10, 10, str,  ST7735_WHITE, ST7735_BLACK);
+    ST7735_DisplayString(10, 20, str,  ST7735_WHITE, ST7735_BLACK);
 
     //ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
@@ -201,7 +201,7 @@ int main(void)
 	        g_frame_capture_complete = 0;
 
 	        // Обновить дисплей
-//	        ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
+	        ST7735_DrawImage(10, 10, 50, 50, g_camera_frame);
 
 	        // Небольшая задержка для визуального восприятия
 	        HAL_Delay(50);
