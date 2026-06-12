@@ -19,7 +19,7 @@
 // Размеры кадра (VGA)
 #define IMAGE_WIDTH  320
 #define IMAGE_HEIGHT 240
-#define IMAGE_FRAME_SIZE (IMAGE_WIDTH * IMAGE_HEIGHT * 2) // RGB565 = 614400 байт
+#define IMAGE_FRAME_SIZE (IMAGE_WIDTH * IMAGE_HEIGHT) // RGB565 = 76 800 пикселей или  153 600 байт
 
 // Буфер для хранения кадра (используем D2 или D3 домен SRAM для H7)
 extern uint16_t g_camera_frame[IMAGE_FRAME_SIZE] __attribute__((aligned(32)));

@@ -170,7 +170,7 @@ void OV5640_StartCapture(void) {
     g_frame_capture_complete = 0;
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 4);
+    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_FRAME_SIZE / 2);
     // Примечание: размер считается в 32-битных словах (раз / 4), т.к. Word = 4 байта.
 }
 
