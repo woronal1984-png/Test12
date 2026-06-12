@@ -2,7 +2,7 @@
 
 const uint8_t ov5640_default_regs[][3] = {
 		   // Системные настройки
-		{0x47, 0x40, 0x60}, //  POLARITY CTRL00  0x21 -> VSYNC на Active High
+		{0x47, 0x40, 0x20}, //  POLARITY CTRL00  0x21 -> VSYNC на Active High
 
 		{0x31, 0x03, 0x11},  // SCCB System Control
 	    {0x30, 0x08, 0x16},

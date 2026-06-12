@@ -78,7 +78,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Устанавливаем флаг, что кадр готов к обработке
     g_frame_capture_complete = 1;
     // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
-     HAL_DCMI_Stop(hdcmi);
+    // HAL_DCMI_Stop(hdcmi);
 
     // Здесь можно обновить дисплей
       // ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
@@ -207,9 +207,7 @@ int main(void)
 	        HAL_Delay(50);
 
 	        // Перезапустить захват, если он остановился
-	        // HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS,
-	        //                    (uint32_t)camera_buffer,
-	        //                    CAMERA_BUFFER_SIZE);
+	        OV5640_StartCapture();
 	    }
 
 
