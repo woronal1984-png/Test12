@@ -69,7 +69,8 @@ void PeriphCommonClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 
-
+static uint16_t line_count = 0;
+static uint32_t frame_count = 0;
 /**
   * @brief Обработчик завершения DMA для DCMI
   * HAL вызовет эту функцию, когда передача данных закончится
@@ -78,20 +79,13 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Устанавливаем флаг, что кадр готов к обработке
     g_frame_capture_complete = 1;
     // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
-    // HAL_DCMI_Stop(hdcmi);
+     HAL_DCMI_Stop(hdcmi);
 
     // Здесь можно обновить дисплей
       // ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
-    static uint32_t frame_count = 0;
+
     frame_count++;
-
-    // Временная индикация на дисплее (например, счётчик кадров)
-    char str[32];
-    sprintf(str, "Frames: %lu", frame_count);
-    ST7735_DisplayString(10, 20, str,  ST7735_WHITE, ST7735_BLACK);
-
-    //ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
 
 }
 
@@ -113,7 +107,7 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 // Добавим DMA callback для отладки
 void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
-    static uint16_t line_count = 0;
+
     line_count++;
     if (line_count >= 240) {
         line_count = 0;
