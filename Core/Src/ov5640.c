@@ -163,7 +163,7 @@ uint8_t OV5640_Init(void) {
 
 
     // Должно быть 0x61 для RGB565 little-endian
-	if ( OV5640_ReadReg(0x4300) != 0x61) {
+	if ( OV5640_ReadReg(0x4300) != 0x90) {
 		return 3; //Wrong format!
 	}
 

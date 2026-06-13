@@ -7,17 +7,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   1 .text         0000c09c  08000298  08000298  00001298  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .rodata       000005ac  0800c334  0800c334  0000d334  2**2
+  2 .rodata       000005b0  0800c334  0800c334  0000d334  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  3 .init_array   00000004  0800c8e0  0800c8e0  0000d8e0  2**2
+  3 .init_array   00000004  0800c8e4  0800c8e4  0000d8e4  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  4 .fini_array   00000004  0800c8e4  0800c8e4  0000d8e4  2**2
+  4 .fini_array   00000004  0800c8e8  0800c8e8  0000d8e8  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
-  5 .data         00000010  24000000  0800c8e8  0000e000  2**2
+  5 .data         00000010  24000000  0800c8ec  0000e000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .bss          00025a10  24000020  0800c8f8  0000e020  2**5
+  6 .bss          00025a10  24000020  0800c8fc  0000e020  2**5
                   ALLOC
-  7 ._user_heap_stack 00000600  24025a30  0800c8f8  0000ea30  2**0
+  7 ._user_heap_stack 00000600  24025a30  0800c8fc  0000ea30  2**0
                   ALLOC
   8 .ARM.attributes 0000002e  00000000  00000000  0000e010  2**0
                   CONTENTS, READONLY
@@ -117,13 +117,13 @@ void MX_DCMI_Init(void)
  8000306:	4b21      	ldr	r3, [pc, #132]	@ (800038c <MX_DCMI_Init+0xb4>)
  8000308:	2200      	movs	r2, #0
  800030a:	609a      	str	r2, [r3, #8]
-  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_LOW;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
  800030c:	4b1f      	ldr	r3, [pc, #124]	@ (800038c <MX_DCMI_Init+0xb4>)
- 800030e:	2200      	movs	r2, #0
+ 800030e:	2280      	movs	r2, #128	@ 0x80
  8000310:	60da      	str	r2, [r3, #12]
-  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
+  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_HIGH;
  8000312:	4b1e      	ldr	r3, [pc, #120]	@ (800038c <MX_DCMI_Init+0xb4>)
- 8000314:	2200      	movs	r2, #0
+ 8000314:	2240      	movs	r2, #64	@ 0x40
  8000316:	611a      	str	r2, [r3, #16]
   hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
  8000318:	4b1c      	ldr	r3, [pc, #112]	@ (800038c <MX_DCMI_Init+0xb4>)
@@ -1855,11 +1855,11 @@ uint8_t OV5640_Init(void) {
 
 
     // Должно быть 0x61 для RGB565 little-endian
-	if ( OV5640_ReadReg(0x4300) != 0x61) {
+	if ( OV5640_ReadReg(0x4300) != 0x90) {
  8000de0:	f44f 4086 	mov.w	r0, #17152	@ 0x4300
  8000de4:	f7ff ff0c 	bl	8000c00 <OV5640_ReadReg>
  8000de8:	4603      	mov	r3, r0
- 8000dea:	2b61      	cmp	r3, #97	@ 0x61
+ 8000dea:	2b90      	cmp	r3, #144	@ 0x90
  8000dec:	d001      	beq.n	8000df2 <OV5640_Init+0xde>
 		return 3; //Wrong format!
  8000dee:	2303      	movs	r3, #3
@@ -1874,7 +1874,7 @@ uint8_t OV5640_Init(void) {
  8000df8:	46bd      	mov	sp, r7
  8000dfa:	bd90      	pop	{r4, r7, pc}
  8000dfc:	0800c654 	.word	0x0800c654
- 8000e00:	0800c718 	.word	0x0800c718
+ 8000e00:	0800c71c 	.word	0x0800c71c
 
 08000e04 <OV5640_StartCapture>:
 
@@ -3159,7 +3159,7 @@ void ST7735_DisplayChar(uint8_t x, uint8_t y, char ch, uint16_t color, uint16_t 
  800161e:	46bd      	mov	sp, r7
  8001620:	bd90      	pop	{r4, r7, pc}
  8001622:	bf00      	nop
- 8001624:	0800c71c 	.word	0x0800c71c
+ 8001624:	0800c720 	.word	0x0800c720
 
 08001628 <ST7735_DisplayString>:
 
@@ -3975,7 +3975,7 @@ LoopForever:
   ldr r1, =_edata
  8001998:	24000010 	.word	0x24000010
   ldr r2, =_sidata
- 800199c:	0800c8e8 	.word	0x0800c8e8
+ 800199c:	0800c8ec 	.word	0x0800c8ec
   ldr r2, =_sbss
  80019a0:	24000020 	.word	0x24000020
   ldr r4, =_ebss
@@ -4077,7 +4077,7 @@ HAL_StatusTypeDef HAL_Init(void)
  8001a10:	46bd      	mov	sp, r7
  8001a12:	bd80      	pop	{r7, pc}
  8001a14:	58024400 	.word	0x58024400
- 8001a18:	0800c8c8 	.word	0x0800c8c8
+ 8001a18:	0800c8cc 	.word	0x0800c8cc
  8001a1c:	24000004 	.word	0x24000004
  8001a20:	24000000 	.word	0x24000000
 
@@ -12344,7 +12344,7 @@ static uint32_t DMA_CalcBaseAndBitshift(DMA_HandleTypeDef *hdma)
  80052ac:	400204a0 	.word	0x400204a0
  80052b0:	400204b8 	.word	0x400204b8
  80052b4:	aaaaaaab 	.word	0xaaaaaaab
- 80052b8:	0800c8d8 	.word	0x0800c8d8
+ 80052b8:	0800c8dc 	.word	0x0800c8dc
  80052bc:	fffffc00 	.word	0xfffffc00
 
 080052c0 <DMA_CheckFifoParam>:
@@ -20314,7 +20314,7 @@ HAL_StatusTypeDef HAL_RCC_ClockConfig(const RCC_ClkInitTypeDef  *RCC_ClkInitStru
  800870a:	bf00      	nop
  800870c:	58024400 	.word	0x58024400
  8008710:	0800c570 	.word	0x0800c570
- 8008714:	0800c8c8 	.word	0x0800c8c8
+ 8008714:	0800c8cc 	.word	0x0800c8cc
  8008718:	24000004 	.word	0x24000004
  800871c:	24000000 	.word	0x24000000
  8008720:	24000008 	.word	0x24000008
@@ -28945,10 +28945,10 @@ static uint32_t SPI_GetPacketSize(const SPI_HandleTypeDef *hspi)
  800c306:	4798      	blx	r3
  800c308:	3601      	adds	r6, #1
  800c30a:	e7f2      	b.n	800c2f2 <__libc_init_array+0x1e>
- 800c30c:	0800c8e0 	.word	0x0800c8e0
- 800c310:	0800c8e0 	.word	0x0800c8e0
- 800c314:	0800c8e0 	.word	0x0800c8e0
- 800c318:	0800c8e4 	.word	0x0800c8e4
+ 800c30c:	0800c8e4 	.word	0x0800c8e4
+ 800c310:	0800c8e4 	.word	0x0800c8e4
+ 800c314:	0800c8e4 	.word	0x0800c8e4
+ 800c318:	0800c8e8 	.word	0x0800c8e8
 
 0800c31c <_init>:
  800c31c:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
