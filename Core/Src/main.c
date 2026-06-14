@@ -22,6 +22,7 @@
 #include "dma.h"
 #include "i2c.h"
 #include "rtc.h"
+#include "sdmmc.h"
 #include "spi.h"
 #include "gpio.h"
 
@@ -105,7 +106,7 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 
 
 // Добавим DMA callback для отладки
-void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi) {
+void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
     line_count++;
@@ -115,6 +116,15 @@ void HAL_DCMI_LineEventCallback(DCMI_HandleTypeDef *hdcmi) {
     }
 }
 
+
+void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
+    // Этот колбэк должен вызываться на каждый VSYNC
+    static uint32_t vsync_count = 0;
+    vsync_count++;
+
+    // Мигаем LED или переключаем пин для осциллографа
+    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3); // Если есть свободный пин
+}
 
 
 /* USER CODE END 0 */
@@ -156,6 +166,7 @@ int main(void)
   MX_RTC_Init();
   MX_I2C1_Init();
   MX_SPI4_Init();
+  MX_SDMMC1_SD_Init();
   /* USER CODE BEGIN 2 */
 
   // 2. Инициализация дисплея
@@ -232,7 +243,7 @@ void SystemClock_Config(void)
 
   /** Configure the main internal regulator output voltage
   */
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE0);
 
   while(!__HAL_PWR_GET_FLAG(PWR_FLAG_VOSRDY)) {}
 
@@ -245,10 +256,10 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 5;
-  RCC_OscInitStruct.PLL.PLLN = 96;
+  RCC_OscInitStruct.PLL.PLLN = 192;
   RCC_OscInitStruct.PLL.PLLP = 2;
-  RCC_OscInitStruct.PLL.PLLQ = 2;
-  RCC_OscInitStruct.PLL.PLLR = 2;
+  RCC_OscInitStruct.PLL.PLLQ = 8;
+  RCC_OscInitStruct.PLL.PLLR = 4;
   RCC_OscInitStruct.PLL.PLLRGE = RCC_PLL1VCIRANGE_2;
   RCC_OscInitStruct.PLL.PLLVCOSEL = RCC_PLL1VCOWIDE;
   RCC_OscInitStruct.PLL.PLLFRACN = 0;
@@ -270,7 +281,7 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_APB2_DIV2;
   RCC_ClkInitStruct.APB4CLKDivider = RCC_APB4_DIV2;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_4) != HAL_OK)
   {
     Error_Handler();
   }

@@ -5,7 +5,7 @@
 ../Core/Src/ov5640.c:99:16:OV5640_ReadRegister	3
 ../Core/Src/ov5640.c:111:9:OV5640_ReadID	3
 ../Core/Src/ov5640.c:120:13:OV5640_HardReset	1
-../Core/Src/ov5640.c:130:9:OV5640_Init	6
-../Core/Src/ov5640.c:174:6:OV5640_StartCapture	1
-../Core/Src/ov5640.c:182:6:OV5640_StopCapture	1
-../Core/Src/ov5640.c:187:13:OV5640_Config_JPEG	1
+../Core/Src/ov5640.c:130:9:OV5640_Init	12
+../Core/Src/ov5640.c:183:6:OV5640_StartCapture	2
+../Core/Src/ov5640.c:200:6:OV5640_StopCapture	1
+../Core/Src/ov5640.c:205:13:OV5640_Config_JPEG	1

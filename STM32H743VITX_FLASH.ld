@@ -175,6 +175,21 @@ SECTIONS
   }
 
   .ARM.attributes 0 : { *(.ARM.attributes) }
+  
+  /* Определите область SDRAM в MEMORY, например: */
+/* SDRAM (xrw) : ORIGIN = 0xC0000000, LENGTH = 8M */
+
+/* Добавьте секцию для размещения буфера */
+	.sdram (NOLOAD) :
+	{
+	    . = ALIGN(32);
+	    *(.sdram)
+	    *(.sdram*)
+	    . = ALIGN(4);
+	} > SDRAM
+  
+  
+  
 }
 
 

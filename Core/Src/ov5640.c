@@ -138,15 +138,27 @@ uint8_t OV5640_Init(void) {
 
     // Задержка для стабилизации питания
     HAL_Delay(20);
-
+    // Сброс
+    OV5640_WriteReg(0x3008, 0x82);
+    HAL_Delay(30);  // Критически важная задержка после сброса!
 
     uint32_t i;
     for ( i = 0; i < ov5640_default_regs_size; i++)
         {
         	OV5640_WriteReg(ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1],
                         ov5640_default_regs[i][2]);
+
+
+        	uint16_t reg_addr = ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1];
             // Можно добавить небольшую задержку для некоторых регистров
-        	HAL_Delay(2);
+            if (reg_addr == 0x3008) {
+                HAL_Delay(20);  // После выхода из сброса
+            } else if ((reg_addr >= 0x3034 && reg_addr <= 0x3037) || reg_addr == 0x3108) {
+                HAL_Delay(5);   // После настроек PLL
+            } else if ((reg_addr >= 0x3800 && reg_addr <= 0x3814)) {
+                // Для регистров таймингов - минимальная задержка
+                for (volatile int d = 0; d < 5; d++);
+            }
         }
 
 
@@ -162,10 +174,7 @@ uint8_t OV5640_Init(void) {
     }
 
 
-    // Должно быть 0x61 для RGB565 little-endian
-	if ( OV5640_ReadReg(0x4300) != 0x90) {
-		return 3; //Wrong format!
-	}
+
 
     return 0;
 }
@@ -173,9 +182,18 @@ uint8_t OV5640_Init(void) {
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
     g_frame_capture_complete = 0;
+
+
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
-    HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS);
+
+
+    // Запуск DMA
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
+        // Ошибка запуска DMA
+        g_frame_capture_complete = 0xFA;
+        return;
+    }
 
 }
 

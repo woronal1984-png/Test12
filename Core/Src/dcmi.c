@@ -33,22 +33,21 @@ void MX_DCMI_Init(void)
 
   /* USER CODE BEGIN DCMI_Init 0 */
 
-    // Регистрируем оба коллбэка
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_FRAME_EVENT_CB_ID, HAL_DCMI_FrameEventCallback);
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_LINE_EVENT_CB_ID, HAL_DCMI_LineEventCallback);
-      HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_ERROR_CB_ID, HAL_DCMI_ErrorCallback);
-
-
   /* USER CODE END DCMI_Init 0 */
 
   /* USER CODE BEGIN DCMI_Init 1 */
+	  // Регистрируем оба коллбэка
+	    HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_FRAME_EVENT_CB_ID, HAL_DCMI_FrameEventCallback);
+	    HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_LINE_EVENT_CB_ID, HAL_DCMI_LineEventCallback);
+	    HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_ERROR_CB_ID, HAL_DCMI_ErrorCallback);
+	    HAL_DCMI_RegisterCallback(&hdcmi, HAL_DCMI_VSYNC_EVENT_CB_ID, HAL_DCMI_VsyncEventCallback);
 
   /* USER CODE END DCMI_Init 1 */
   hdcmi.Instance = DCMI;
   hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
   hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_FALLING;
-  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
-  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_HIGH;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_LOW;
+  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
   hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
   hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
   hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;
@@ -62,11 +61,14 @@ void MX_DCMI_Init(void)
   }
   /* USER CODE BEGIN DCMI_Init 2 */
 
+
+
+
   // 6. Включаем прерывания ПОСЛЕ инициализации
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_LINE);
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_FRAME);
   __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_ERR);
-
+  __HAL_DCMI_ENABLE_IT(&hdcmi, DCMI_IT_VSYNC);
 
   /* USER CODE END DCMI_Init 2 */
 
