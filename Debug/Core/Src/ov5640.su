@@ -6,6 +6,6 @@
 ../Core/Src/ov5640.c:111:9:OV5640_ReadID	24	static
 ../Core/Src/ov5640.c:120:13:OV5640_HardReset	8	static
 ../Core/Src/ov5640.c:130:9:OV5640_Init	32	static
-../Core/Src/ov5640.c:183:6:OV5640_StartCapture	8	static
-../Core/Src/ov5640.c:200:6:OV5640_StopCapture	8	static
-../Core/Src/ov5640.c:205:13:OV5640_Config_JPEG	4	static
+../Core/Src/ov5640.c:195:6:OV5640_StartCapture	8	static
+../Core/Src/ov5640.c:212:6:OV5640_StopCapture	8	static
+../Core/Src/ov5640.c:217:13:OV5640_Config_JPEG	4	static

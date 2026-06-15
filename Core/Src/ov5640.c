@@ -140,7 +140,14 @@ uint8_t OV5640_Init(void) {
     HAL_Delay(20);
     // Сброс
     OV5640_WriteReg(0x3008, 0x82);
-    HAL_Delay(30);  // Критически важная задержка после сброса!
+    HAL_Delay(5);  // Критически важная задержка после сброса!
+
+
+    // 2. Выключить питание (Software Power Down) на время всей остальной настройки
+    OV5640_WriteReg(0x3008, 0x42);
+    HAL_Delay(5);
+
+
 
     uint32_t i;
     for ( i = 0; i < ov5640_default_regs_size; i++)
@@ -161,9 +168,14 @@ uint8_t OV5640_Init(void) {
             }
         }
 
+    // 4. ВКЛЮЧИТЬ КАМЕРУ (Software Power Up) - САМЫЙ ВАЖНЫЙ ШАГ!
+    OV5640_WriteReg(0x3008, 0x02);
 
     HAL_Delay(100);
 
+
+
+    if (pid != 0x5640) return 1; // Ошибка: камера не отвечает
     // Проверяем ID. Если чтение не удалось (HAL_BUSY или ошибка) — камера не отвечает.
     if (OV5640_ReadID(&id) != 0) {
         return 1; // Ошибка I2C
