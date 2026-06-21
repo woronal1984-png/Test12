@@ -12,4 +12,3 @@
 ../Core/Src/stm32h7xx_it.c:237:6:DMA2_Stream0_IRQHandler	8	static
 ../Core/Src/stm32h7xx_it.c:251:6:DCMI_IRQHandler	8	static
 ../Core/Src/stm32h7xx_it.c:266:6:SPI4_IRQHandler	8	static
-../Core/Src/stm32h7xx_it.c:280:6:DMAMUX1_OVR_IRQHandler	4	static

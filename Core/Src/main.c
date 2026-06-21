@@ -98,7 +98,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
 void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
     // Можно зажечь светодиод ошибки или вывести сообщение в UART
     // Error handler
-    g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
+    //g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
 }
 
 
@@ -110,7 +110,7 @@ void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
     line_count++;
-    if (line_count >= 240) {
+    if (line_count >= 1080) {
         line_count = 0;
 //        g_frame_capture_complete = 1; // Кадр готов после 240 строк
     }
@@ -123,7 +123,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
     vsync_count++;
 
     // Мигаем LED или переключаем пин для осциллографа
-    HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3); // Если есть свободный пин
+    //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3); // Если есть свободный пин
 }
 
 
@@ -212,7 +212,7 @@ int main(void)
 	        HAL_Delay(50);
 
 	        // Перезапустить захват, если он остановился
-	        OV5640_StartCapture();
+	       // OV5640_StartCapture();
 	    }
 
 

@@ -60,7 +60,6 @@ void SDMMC1_IRQHandler(void);
 void DMA2_Stream0_IRQHandler(void);
 void DCMI_IRQHandler(void);
 void SPI4_IRQHandler(void);
-void DMAMUX1_OVR_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
