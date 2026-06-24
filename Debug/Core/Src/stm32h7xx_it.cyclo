@@ -8,7 +8,7 @@
 ../Core/Src/stm32h7xx_it.c:176:6:PendSV_Handler	1
 ../Core/Src/stm32h7xx_it.c:189:6:SysTick_Handler	1
 ../Core/Src/stm32h7xx_it.c:210:6:RCC_IRQHandler	1
-../Core/Src/stm32h7xx_it.c:223:6:SDMMC1_IRQHandler	1
-../Core/Src/stm32h7xx_it.c:237:6:DMA2_Stream0_IRQHandler	1
+../Core/Src/stm32h7xx_it.c:223:6:DMA1_Stream0_IRQHandler	1
+../Core/Src/stm32h7xx_it.c:237:6:SDMMC1_IRQHandler	1
 ../Core/Src/stm32h7xx_it.c:251:6:DCMI_IRQHandler	1
 ../Core/Src/stm32h7xx_it.c:266:6:SPI4_IRQHandler	1

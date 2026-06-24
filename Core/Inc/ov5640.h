@@ -22,17 +22,17 @@
 
 
 // Количество пикселей
-#define IMAGE_PIXELS  (IMAGE_WIDTH * IMAGE_HEIGHT)  // 76800
+#define IMAGE_PIXELS  (IMAGE_WIDTH * IMAGE_HEIGHT)  // 2073600 pixel
 
-// Размер буфера в байтах (RGB565 = 2 байта на пиксель)
-#define IMAGE_BUFFER_BYTES  (IMAGE_PIXELS * 2)  // 153600 байт
+// Размер буфера в байтах (RAW = 1 байт на пиксель)
+#define IMAGE_BUFFER_BYTES  (IMAGE_PIXELS * 1)  // 2073600 байт
 
 // Размер для DMA в 32-битных словах
-#define IMAGE_DMA_WORDS     (IMAGE_BUFFER_BYTES / 4)  // 38400 слов
+#define IMAGE_DMA_WORDS  (IMAGE_BUFFER_BYTES / 4)  // 518400 слов
 
 
 // Массив uint16_t (каждый элемент = 1 пиксель)
-extern uint16_t g_camera_frame[IMAGE_PIXELS] __attribute__((section(".sdram"), aligned(32)));
+extern uint8_t  g_camera_frame[IMAGE_PIXELS] __attribute__((section(".sdram"), aligned(4)));
 
 extern volatile uint8_t g_frame_capture_complete;
 extern const uint8_t ov5640_default_regs[][3];

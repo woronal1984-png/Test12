@@ -105,15 +105,74 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
 
 
 
+uint32_t checksum_prev = 0;
+
+void Check_Buffer_Data(void) {
+    // Проверяем первые 100 пикселей на изменения
+    uint32_t sum = 0;
+    for (int i = 0; i < 100; i++) {
+        sum += g_camera_frame[i];
+    }
+
+    if (sum != checksum_prev) {
+        // Данные изменились - камера что-то передает
+        ST7735_DisplayString(10, 40, "DATA CHANGED!",  ST7735_WHITE, ST7735_BLACK);
+        checksum_prev = sum;
+    } else {
+        // Данные не меняются
+        ST7735_DisplayString(10, 40, "DATA STABLE",  ST7735_WHITE, ST7735_BLACK);
+    }
+}
+
+
+void Check_DMA_Activity(void) {
+    // NDTR - количество оставшихся слов для передачи
+    uint32_t ndtr = DMA2_Stream0->NDTR;
+
+    // Статус DMA (включен ли)
+    uint32_t dma_en = (DMA2_Stream0->CR & DMA_SxCR_EN) ? 1 : 0;
+
+    char msg[40];
+    sprintf(msg, "NDTR: %lu, EN: %d", ndtr, dma_en);
+    ST7735_DisplayString(10, 50, msg, ST7735_WHITE, ST7735_BLACK);
+
+    // Если NDTR меняется - данные идут
+    static uint32_t prev_ndtr = 0;
+    if (ndtr != prev_ndtr) {
+        ST7735_DisplayString(10, 70, "DMA IS TRANSFERRING", ST7735_WHITE, ST7735_BLACK);
+        prev_ndtr = ndtr;
+    } else {
+        ST7735_DisplayString(10, 70, "DMA NOT TRANSFERRING", ST7735_WHITE, ST7735_BLACK);
+    }
+}
+
+
+
+
 // Добавим DMA callback для отладки
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
-    line_count++;
-    if (line_count >= 1080) {
-        line_count = 0;
-//        g_frame_capture_complete = 1; // Кадр готов после 240 строк
+	line_count ++;
+
+    // Каждые 10 строк показываем прогресс
+    if (line_count % 10 == 0) {
+       // ST7735_DisplayString(10, 30, "Test",  ST7735_WHITE, ST7735_BLACK);
+    	Check_DMA_Activity();
+        // Если счетчик дошел до 1080 - это кадр
+        if (line_count >= 1080) {
+            //ST7735_DisplayString(10, 50, "FRAME COMPLETE!",  ST7735_WHITE, ST7735_BLACK);
+            Check_Buffer_Data();
+            Check_DMA_Activity();
+            line_count = 0;  // Сброс для следующего кадра
+        }
     }
+
+
+
+
+
+
 }
 
 
@@ -125,6 +184,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Мигаем LED или переключаем пин для осциллографа
     //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3); // Если есть свободный пин
 }
+
 
 
 /* USER CODE END 0 */
@@ -206,7 +266,7 @@ int main(void)
 	        g_frame_capture_complete = 0;
 
 	        // Обновить дисплей
-	        ST7735_DrawImage(10, 10, 50, 50, g_camera_frame);
+	       // ST7735_DrawImage(10, 10, 50, 50, g_camera_frame);
 
 	        // Небольшая задержка для визуального восприятия
 	        HAL_Delay(50);

@@ -45,9 +45,9 @@ void MX_DCMI_Init(void)
   /* USER CODE END DCMI_Init 1 */
   hdcmi.Instance = DCMI;
   hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
-  hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_FALLING;
-  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
-  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_HIGH;
+  hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_RISING;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_LOW;
+  hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
   hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
   hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
   hdcmi.Init.JPEGMode = DCMI_JPEG_DISABLE;
@@ -140,18 +140,16 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    HAL_I2CEx_EnableFastModePlus(SYSCFG_PMCR_I2C_PB7_FMP);
-
     /* DCMI DMA Init */
     /* DCMI Init */
-    hdma_dcmi.Instance = DMA2_Stream0;
+    hdma_dcmi.Instance = DMA1_Stream0;
     hdma_dcmi.Init.Request = DMA_REQUEST_DCMI;
     hdma_dcmi.Init.Direction = DMA_PERIPH_TO_MEMORY;
     hdma_dcmi.Init.PeriphInc = DMA_PINC_DISABLE;
     hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_dcmi.Init.Mode = DMA_CIRCULAR;
+    hdma_dcmi.Init.Mode = DMA_NORMAL;
     hdma_dcmi.Init.Priority = DMA_PRIORITY_HIGH;
     hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
