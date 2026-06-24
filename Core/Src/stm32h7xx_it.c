@@ -58,7 +58,6 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
-extern DMA_HandleTypeDef hdma_dcmi;
 extern DCMI_HandleTypeDef hdcmi;
 extern SD_HandleTypeDef hsd1;
 extern SPI_HandleTypeDef hspi4;
@@ -215,20 +214,6 @@ void RCC_IRQHandler(void)
   /* USER CODE BEGIN RCC_IRQn 1 */
 
   /* USER CODE END RCC_IRQn 1 */
-}
-
-/**
-  * @brief This function handles DMA1 stream0 global interrupt.
-  */
-void DMA1_Stream0_IRQHandler(void)
-{
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-
-  /* USER CODE END DMA1_Stream0_IRQn 0 */
-  HAL_DMA_IRQHandler(&hdma_dcmi);
-  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
-
-  /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
 /**

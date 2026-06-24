@@ -146,7 +146,22 @@ void Check_DMA_Activity(void) {
     }
 }
 
+void Check_DMA_Error(void) {
+    // Проверяем флаги ошибок DMA2 Stream0
+    uint32_t lisr = DMA2->LISR;  // Low Interrupt Status Register
+    uint32_t hisr = DMA2->HISR;  // High Interrupt Status Register
 
+    // Для Stream0 используются биты в LISR
+    if (lisr & DMA_LISR_TEIF0) {
+        ST7735_DisplayString(10, 70, "DMA TRANSFER ERROR!", ST7735_WHITE, ST7735_BLACK);
+    }
+    if (lisr & DMA_LISR_FEIF0) {
+        ST7735_DisplayString(10, 70, "DMA FIFO ERROR!", ST7735_WHITE, ST7735_BLACK);
+    }
+    if (lisr & DMA_LISR_DMEIF0) {
+        ST7735_DisplayString(10, 70, "DMA DIRECT MODE ERROR!", ST7735_WHITE, ST7735_BLACK);
+    }
+}
 
 
 // Добавим DMA callback для отладки
@@ -154,16 +169,14 @@ void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
 	line_count ++;
-
+	Check_DMA_Error();
     // Каждые 10 строк показываем прогресс
     if (line_count % 10 == 0) {
        // ST7735_DisplayString(10, 30, "Test",  ST7735_WHITE, ST7735_BLACK);
-    	Check_DMA_Activity();
+
         // Если счетчик дошел до 1080 - это кадр
         if (line_count >= 1080) {
             //ST7735_DisplayString(10, 50, "FRAME COMPLETE!",  ST7735_WHITE, ST7735_BLACK);
-            Check_Buffer_Data();
-            Check_DMA_Activity();
             line_count = 0;  // Сброс для следующего кадра
         }
     }
