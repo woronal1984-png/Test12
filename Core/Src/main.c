@@ -137,14 +137,7 @@ void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
 		line_count ++;
 	}
 
-	find_first_zero_word(g_camera_frame, IMAGE_DMA_WORDS, &idx);
 
-
-	// Если счетчик дошел до 1080 - это кадр
-	if (line_count >= 2340) {
-
-		line_count = 0;  // Сброс для следующего кадра
-	}
 
 
 }
