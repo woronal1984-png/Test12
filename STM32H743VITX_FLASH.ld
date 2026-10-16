@@ -166,6 +166,18 @@ SECTIONS
     . = ALIGN(8);
   } >RAM_D1
 
+
+  .camera_buffer (NOLOAD) :
+  {
+    . = ALIGN(32);
+    *(.camera_buffer)
+    . = ALIGN(32);
+  } >RAM_D1
+  
+
+
+
+
   /* Remove information from the standard libraries */
   /DISCARD/ :
   {
@@ -173,21 +185,9 @@ SECTIONS
     libm.a ( * )
     libgcc.a ( * )
   }
-
+  
+  
   .ARM.attributes 0 : { *(.ARM.attributes) }
-  
-  /* Определите область SDRAM в MEMORY, например: */
-/* SDRAM (xrw) : ORIGIN = 0xC0000000, LENGTH = 8M */
-
-/* Добавьте секцию для размещения буфера */
-	.sdram (NOLOAD) :
-	{
-	    . = ALIGN(32);
-	    *(.sdram)
-	    *(.sdram*)
-	    . = ALIGN(4);
-	} > SDRAM
-  
   
   
 }

@@ -22,7 +22,6 @@
 #include "dma.h"
 #include "i2c.h"
 #include "rtc.h"
-#include "sdmmc.h"
 #include "spi.h"
 #include "gpio.h"
 
@@ -32,7 +31,9 @@
 #include "ov5640.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "st7735.h"
+#include "rgb_convert.h"
 
 /* USER CODE END Includes */
 
@@ -62,6 +63,7 @@ volatile uint8_t g_frame_capture_complete = 0;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 void PeriphCommonClock_Config(void);
+static void MPU_Config(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -72,6 +74,33 @@ void PeriphCommonClock_Config(void);
 
 static uint16_t line_count = 0;
 static uint32_t frame_count = 0;
+static uint32_t vsync_count = 0;
+
+
+/**
+ * Ищет первое 32-битное слово, равное нулю.
+ *
+ * @param buffer  Указатель на массив
+ * @param size    Количество слов
+ * @param index   [out] Индекс найденного слова
+ * @return true, если ноль найден; false, если нет
+ */
+bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index)
+{
+    for (uint32_t i = 0; i < size; i++)
+    {
+        if (buffer[i] == 0)
+        {
+            *index = i;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+
 /**
   * @brief Обработчик завершения DMA для DCMI
   * HAL вызовет эту функцию, когда передача данных закончится
@@ -80,11 +109,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Устанавливаем флаг, что кадр готов к обработке
     g_frame_capture_complete = 1;
     // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
-     HAL_DCMI_Stop(hdcmi);
-
-    // Здесь можно обновить дисплей
-      // ST7735_DrawImage(0, 0, 320, 240, camera_buffer);
-
+    //HAL_DCMI_Stop(hdcmi);
 
     frame_count++;
 
@@ -101,89 +126,25 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
     //g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
 }
 
-
-
-
-
-uint32_t checksum_prev = 0;
-
-void Check_Buffer_Data(void) {
-    // Проверяем первые 100 пикселей на изменения
-    uint32_t sum = 0;
-    for (int i = 0; i < 100; i++) {
-        sum += g_camera_frame[i];
-    }
-
-    if (sum != checksum_prev) {
-        // Данные изменились - камера что-то передает
-        ST7735_DisplayString(10, 40, "DATA CHANGED!",  ST7735_WHITE, ST7735_BLACK);
-        checksum_prev = sum;
-    } else {
-        // Данные не меняются
-        ST7735_DisplayString(10, 40, "DATA STABLE",  ST7735_WHITE, ST7735_BLACK);
-    }
-}
-
-
-void Check_DMA_Activity(void) {
-    // NDTR - количество оставшихся слов для передачи
-    uint32_t ndtr = DMA2_Stream0->NDTR;
-
-    // Статус DMA (включен ли)
-    uint32_t dma_en = (DMA2_Stream0->CR & DMA_SxCR_EN) ? 1 : 0;
-
-    char msg[40];
-    sprintf(msg, "NDTR: %lu, EN: %d", ndtr, dma_en);
-    ST7735_DisplayString(10, 50, msg, ST7735_WHITE, ST7735_BLACK);
-
-    // Если NDTR меняется - данные идут
-    static uint32_t prev_ndtr = 0;
-    if (ndtr != prev_ndtr) {
-        ST7735_DisplayString(10, 70, "DMA IS TRANSFERRING", ST7735_WHITE, ST7735_BLACK);
-        prev_ndtr = ndtr;
-    } else {
-        ST7735_DisplayString(10, 70, "DMA NOT TRANSFERRING", ST7735_WHITE, ST7735_BLACK);
-    }
-}
-
-void Check_DMA_Error(void) {
-    // Проверяем флаги ошибок DMA2 Stream0
-    uint32_t lisr = DMA2->LISR;  // Low Interrupt Status Register
-    uint32_t hisr = DMA2->HISR;  // High Interrupt Status Register
-
-    // Для Stream0 используются биты в LISR
-    if (lisr & DMA_LISR_TEIF0) {
-        ST7735_DisplayString(10, 70, "DMA TRANSFER ERROR!", ST7735_WHITE, ST7735_BLACK);
-    }
-    if (lisr & DMA_LISR_FEIF0) {
-        ST7735_DisplayString(10, 70, "DMA FIFO ERROR!", ST7735_WHITE, ST7735_BLACK);
-    }
-    if (lisr & DMA_LISR_DMEIF0) {
-        ST7735_DisplayString(10, 70, "DMA DIRECT MODE ERROR!", ST7735_WHITE, ST7735_BLACK);
-    }
-}
-
-
+uint32_t idx;
+uint32_t byte_idx;
 // Добавим DMA callback для отладки
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
-	line_count ++;
-	Check_DMA_Error();
-    // Каждые 10 строк показываем прогресс
-    if (line_count % 10 == 0) {
-       // ST7735_DisplayString(10, 30, "Test",  ST7735_WHITE, ST7735_BLACK);
+	if (DCMI->CR & DCMI_CR_CAPTURE)
+	{
+		line_count ++;
+	}
 
-        // Если счетчик дошел до 1080 - это кадр
-        if (line_count >= 1080) {
-            //ST7735_DisplayString(10, 50, "FRAME COMPLETE!",  ST7735_WHITE, ST7735_BLACK);
-            line_count = 0;  // Сброс для следующего кадра
-        }
-    }
+	find_first_zero_word(g_camera_frame, IMAGE_DMA_WORDS, &idx);
 
 
+	// Если счетчик дошел до 1080 - это кадр
+	if (line_count >= 2340) {
 
-
+		line_count = 0;  // Сброс для следующего кадра
+	}
 
 
 }
@@ -191,14 +152,31 @@ void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
 
 void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Этот колбэк должен вызываться на каждый VSYNC
-    static uint32_t vsync_count = 0;
-    vsync_count++;
 
-    // Мигаем LED или переключаем пин для осциллографа
-    //HAL_GPIO_TogglePin(GPIOE, GPIO_PIN_3); // Если есть свободный пин
+    vsync_count++;
 }
 
 
+void HAL_DMA_ConvCpltCallback(DMA_HandleTypeDef *hdma)
+{
+    // Проверяем, что это наш DMA-канал
+    if (hdma->Instance == DMA2_Stream1)
+    {
+        // Кадр полностью передан в память
+    	g_frame_capture_complete = 1;  // Устанавливаем флаг
+    }
+}
+
+void HAL_DMA_ErrorCallback(DMA_HandleTypeDef *hdma)
+{
+    if (hdma->Instance == DMA2_Stream1)
+    {
+        // Обработка ошибки DMA (например, сброс и перезапуск)
+        Error_Handler();
+    }
+}
+
+volatile uint8_t hts_h, hts_l, vts_h, vts_l;
 
 /* USER CODE END 0 */
 
@@ -212,6 +190,9 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
+
+  /* MPU Configuration--------------------------------------------------------*/
+  MPU_Config();
 
   /* MCU Configuration--------------------------------------------------------*/
 
@@ -239,8 +220,10 @@ int main(void)
   MX_RTC_Init();
   MX_I2C1_Init();
   MX_SPI4_Init();
-  MX_SDMMC1_SD_Init();
   /* USER CODE BEGIN 2 */
+
+
+
 
   // 2. Инициализация дисплея
       ST7735_BL_ON();
@@ -259,10 +242,19 @@ int main(void)
       ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
 
 
+     // Test_DMA_To_D2SRAM();
+
+      //  Обнулим буфер изображения перед использованием
+      memset(g_camera_frame, 0, sizeof(g_camera_frame));
+
+
+      hts_h = OV5640_ReadReg(0x380C);
+      hts_l = OV5640_ReadReg(0x380D);
+      vts_h = OV5640_ReadReg(0x380E);
+      vts_l = OV5640_ReadReg(0x380F);
 
       //Start_Camera_Capture();
       OV5640_StartCapture();
-
 
 
   /* USER CODE END 2 */
@@ -278,14 +270,20 @@ int main(void)
 	    if (g_frame_capture_complete) {
 	        g_frame_capture_complete = 0;
 
+	        raw8_bggr_to_rgb565_interpolated((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH, BAYER_HEIGHT);
 	        // Обновить дисплей
-	       // ST7735_DrawImage(10, 10, 50, 50, g_camera_frame);
+	        ST7735_DrawImage(10, 10, 80, 80, rgb_buffer);
 
 	        // Небольшая задержка для визуального восприятия
 	        HAL_Delay(50);
 
+
+	        //  Обнулим буфер изображения перед использованием
+	        memset(g_camera_frame, 0, sizeof(g_camera_frame));
+
+
 	        // Перезапустить захват, если он остановился
-	       // OV5640_StartCapture();
+	        OV5640_StartCapture();
 	    }
 
 
@@ -383,6 +381,47 @@ void PeriphCommonClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 /* USER CODE END 4 */
+
+ /* MPU Configuration */
+
+void MPU_Config(void)
+{
+  MPU_Region_InitTypeDef MPU_InitStruct = {0};
+
+  /* Disables the MPU */
+  HAL_MPU_Disable();
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Enable = MPU_REGION_ENABLE;
+  MPU_InitStruct.Number = MPU_REGION_NUMBER0;
+  MPU_InitStruct.BaseAddress = 0x24000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_512KB;
+  MPU_InitStruct.SubRegionDisable = 0x00;
+  MPU_InitStruct.TypeExtField = MPU_TEX_LEVEL0;
+  MPU_InitStruct.AccessPermission = MPU_REGION_FULL_ACCESS;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_DISABLE;
+  MPU_InitStruct.IsShareable = MPU_ACCESS_NOT_SHAREABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_NOT_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_NOT_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+
+  /** Initializes and configures the Region and the memory to be protected
+  */
+  MPU_InitStruct.Number = MPU_REGION_NUMBER1;
+  MPU_InitStruct.BaseAddress = 0x30000000;
+  MPU_InitStruct.Size = MPU_REGION_SIZE_256KB;
+  MPU_InitStruct.SubRegionDisable = 0x0;
+  MPU_InitStruct.DisableExec = MPU_INSTRUCTION_ACCESS_ENABLE;
+  MPU_InitStruct.IsCacheable = MPU_ACCESS_CACHEABLE;
+  MPU_InitStruct.IsBufferable = MPU_ACCESS_BUFFERABLE;
+
+  HAL_MPU_ConfigRegion(&MPU_InitStruct);
+  /* Enables the MPU */
+  HAL_MPU_Enable(MPU_PRIVILEGED_DEFAULT);
+
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

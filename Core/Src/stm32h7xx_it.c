@@ -24,12 +24,12 @@
 /* USER CODE BEGIN Includes */
 
 #include "ov5640.h"
-
+#include "dma.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN TD */
-
+extern DMA_HandleTypeDef hdma_dcmi;
 /* USER CODE END TD */
 
 /* Private define ------------------------------------------------------------*/
@@ -58,8 +58,8 @@
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_dcmi;
 extern DCMI_HandleTypeDef hdcmi;
-extern SD_HandleTypeDef hsd1;
 extern SPI_HandleTypeDef hspi4;
 /* USER CODE BEGIN EV */
 
@@ -89,7 +89,7 @@ void NMI_Handler(void)
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
-
+	__ASM volatile("BKPT #01");
   /* USER CODE END HardFault_IRQn 0 */
   while (1)
   {
@@ -204,6 +204,20 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles Flash global interrupt.
+  */
+void FLASH_IRQHandler(void)
+{
+  /* USER CODE BEGIN FLASH_IRQn 0 */
+
+  /* USER CODE END FLASH_IRQn 0 */
+  HAL_FLASH_IRQHandler();
+  /* USER CODE BEGIN FLASH_IRQn 1 */
+
+  /* USER CODE END FLASH_IRQn 1 */
+}
+
+/**
   * @brief This function handles RCC global interrupt.
   */
 void RCC_IRQHandler(void)
@@ -217,17 +231,17 @@ void RCC_IRQHandler(void)
 }
 
 /**
-  * @brief This function handles SDMMC1 global interrupt.
+  * @brief This function handles DMA1 stream0 global interrupt.
   */
-void SDMMC1_IRQHandler(void)
+void DMA1_Stream0_IRQHandler(void)
 {
-  /* USER CODE BEGIN SDMMC1_IRQn 0 */
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
 
-  /* USER CODE END SDMMC1_IRQn 0 */
-  HAL_SD_IRQHandler(&hsd1);
-  /* USER CODE BEGIN SDMMC1_IRQn 1 */
+  /* USER CODE END DMA1_Stream0_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_dcmi);
+  /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
 
-  /* USER CODE END SDMMC1_IRQn 1 */
+  /* USER CODE END DMA1_Stream0_IRQn 1 */
 }
 
 /**
@@ -237,12 +251,24 @@ void DCMI_IRQHandler(void)
 {
   /* USER CODE BEGIN DCMI_IRQn 0 */
 
-
   /* USER CODE END DCMI_IRQn 0 */
   HAL_DCMI_IRQHandler(&hdcmi);
   /* USER CODE BEGIN DCMI_IRQn 1 */
 
   /* USER CODE END DCMI_IRQn 1 */
+}
+
+/**
+  * @brief This function handles FPU global interrupt.
+  */
+void FPU_IRQHandler(void)
+{
+  /* USER CODE BEGIN FPU_IRQn 0 */
+
+  /* USER CODE END FPU_IRQn 0 */
+  /* USER CODE BEGIN FPU_IRQn 1 */
+
+  /* USER CODE END FPU_IRQn 1 */
 }
 
 /**

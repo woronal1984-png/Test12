@@ -123,6 +123,7 @@ SECTIONS
     PROVIDE_HIDDEN (__fini_array_end = .);
   } >RAM_EXEC
 
+  
   /* used by the startup to initialize data */
   _sidata = LOADADDR(.data);
 

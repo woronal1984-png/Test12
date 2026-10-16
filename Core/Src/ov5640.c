@@ -12,7 +12,8 @@
 #include "i2c.h"    // HAL I2C драйвер
 
 // Глобальные переменные
-uint8_t g_camera_frame[IMAGE_PIXELS] __attribute__((aligned(32)));
+//uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((aligned(32)));
+uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((section(".camera_buffer"), aligned(32)));
 
 // Прототипы
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data);
@@ -116,15 +117,6 @@ uint8_t OV5640_ReadID(uint16_t *DeviceID) {
     return 0;
 }
 
-// Сброс камеры аппаратно
-static void OV5640_HardReset(void) {
-    HAL_GPIO_WritePin(OV5640_RST_GPIO_Port, OV5640_RST_Pin, GPIO_PIN_RESET);
-    HAL_Delay(10);
-    HAL_GPIO_WritePin(OV5640_RST_GPIO_Port, OV5640_RST_Pin, GPIO_PIN_SET);
-    HAL_Delay(10);
-    HAL_GPIO_WritePin(OV5640_PWDN_GPIO_Port, OV5640_PWDN_Pin, GPIO_PIN_RESET); // PWDN=0 Работаем
-    HAL_Delay(50);
-}
 
 // Базовая инициализация (заливка регистров)
 uint8_t OV5640_Init(void) {
@@ -139,6 +131,7 @@ uint8_t OV5640_Init(void) {
     // Задержка для стабилизации питания
     HAL_Delay(20);
     // Сброс
+    OV5640_WriteReg(0x3103, 0x11);  // system clock from pad, bit[1]
     OV5640_WriteReg(0x3008, 0x82);
     HAL_Delay(5);  // Критически важная задержка после сброса!
 
@@ -188,33 +181,30 @@ uint8_t OV5640_Init(void) {
 
 
 
+
     return 0;
 }
 
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
-    g_frame_capture_complete = 0;
-
+    //g_frame_capture_complete = 0;
 
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
 
 
     // Запуск DMA
-    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_BUFFER_BYTES) != HAL_OK) {
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
         // Ошибка запуска DMA
-        g_frame_capture_complete = 0xFA;
+    	int j=1;
         return;
     }
 
+    int j=1;
 }
 
 void OV5640_StopCapture(void) {
     HAL_DCMI_Stop(&hdcmi);
 }
 
-// Пример конфигурации для работы с JPEG (если понадобится)
-static void OV5640_Config_JPEG(void) {
-    // Переключить камеру в JPEG режим: 0x3500, 0x4600 и т.д.
-    // Не используется в текущем базовом примере
-}
+
