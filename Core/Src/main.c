@@ -132,13 +132,6 @@ uint32_t byte_idx;
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
-	if (DCMI->CR & DCMI_CR_CAPTURE)
-	{
-		line_count ++;
-	}
-
-
-
 
 }
 
@@ -150,15 +143,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
 }
 
 
-void HAL_DMA_ConvCpltCallback(DMA_HandleTypeDef *hdma)
-{
-    // Проверяем, что это наш DMA-канал
-    if (hdma->Instance == DMA2_Stream1)
-    {
-        // Кадр полностью передан в память
-    	g_frame_capture_complete = 1;  // Устанавливаем флаг
-    }
-}
+
 
 void HAL_DMA_ErrorCallback(DMA_HandleTypeDef *hdma)
 {
