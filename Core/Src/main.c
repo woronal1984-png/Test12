@@ -144,16 +144,6 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
 
 
 
-
-void HAL_DMA_ErrorCallback(DMA_HandleTypeDef *hdma)
-{
-    if (hdma->Instance == DMA2_Stream1)
-    {
-        // Обработка ошибки DMA (например, сброс и перезапуск)
-        Error_Handler();
-    }
-}
-
 volatile uint8_t hts_h, hts_l, vts_h, vts_l;
 
 /* USER CODE END 0 */
