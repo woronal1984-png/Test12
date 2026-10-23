@@ -10,8 +10,8 @@
 #define INC_RGB_CONVERT_H_
 
 // Размеры исходного Bayer-изображения
-#define BAYER_WIDTH   320
-#define BAYER_HEIGHT  240
+#define BAYER_WIDTH   160
+#define BAYER_HEIGHT  120
 
 // Размеры выходного RGB565 (вдвое меньше)
 #define RGB_WIDTH     (BAYER_WIDTH / 2)
@@ -19,7 +19,7 @@
 #define RGB_BUFFER_SIZE (RGB_WIDTH * RGB_HEIGHT)
 
 // Буфер RGB565
-extern uint16_t rgb_buffer[RGB_BUFFER_SIZE] __attribute__((aligned(32)));
+extern uint16_t rgb_buffer[RGB_BUFFER_SIZE] __attribute__((aligned(16)));
 
 
 /**

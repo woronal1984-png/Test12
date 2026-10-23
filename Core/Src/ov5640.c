@@ -13,7 +13,7 @@
 
 // Глобальные переменные
 //uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((aligned(32)));
-uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((section(".camera_buffer"), aligned(32)));
+uint32_t  g_camera_frame[IMAGE_BUFFER_BYTES] __attribute__((section(".camera_buffer"), aligned(32)));
 
 // Прототипы
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data);
@@ -194,7 +194,7 @@ void OV5640_StartCapture(void) {
 
 
     // Запуск DMA
-    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_BUFFER_BYTES) != HAL_OK) {
         // Ошибка запуска DMA
     	int j=1;
         return;

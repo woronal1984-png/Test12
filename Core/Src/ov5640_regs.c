@@ -4,7 +4,7 @@ const uint8_t ov5640_default_regs[][3] = {
 
 
 //Полярности и интерфейсы
-			{0x47, 0x40, 0x21}, //  Устанавливает полярности PCLK (активный высокий), HREF (активный низкий) и VSYNC (активный высокий)
+			{0x47, 0x40, 0x20}, //  Устанавливает полярности PCLK (активный высокий), HREF (активный низкий) и VSYNC (активный высокий)
 			//{0x47, 0x00, 0x00}, // Настраиваем DVP на параллельный 8-битный вывод
 
 			{0x40, 0x50, 0x6e}, //Настройка PLL (ФАПЧ) сенсора
@@ -140,10 +140,10 @@ const uint8_t ov5640_default_regs[][3] = {
 			{0x38, 0x05, 0x3f}, // X_ADDR_END = ( X_ADDR_ST + X_OFFSET + X_OUTPUT_SIZE )  2623
 			{0x38, 0x06, 0x07}, // Y_ADDR_END
 			{0x38, 0x07, 0x9b}, // Y_ADDR_END = ( Y_ADDR_ST + Y_OFFSET + Y_OUTPUT_SIZE  ) 1764
-			{0x38, 0x08, 0x01}, // X_OUTPUT_SIZE
-			{0x38, 0x09, 0x40}, // X_OUTPUT_SIZE 320
+			{0x38, 0x08, 0x00}, // X_OUTPUT_SIZE
+			{0x38, 0x09, 0xa0}, // X_OUTPUT_SIZE 160
 			{0x38, 0x0a, 0x00}, // Y_OUTPUT_SIZE
-			{0x38, 0x0b, 0xf0}, // Y_OUTPUT_SIZE 240
+			{0x38, 0x0b, 0x78}, // Y_OUTPUT_SIZE 120
 			{0x38, 0x10, 0x00}, //X_OFFSET  0
 			{0x38, 0x11, 0x10}, //X_OFFSET  0
 			{0x38, 0x12, 0x00}, //Y_OFFSET  0
@@ -157,7 +157,7 @@ const uint8_t ov5640_default_regs[][3] = {
 			{0x30, 0x08, 0x02},  // Системный сброс
 
 			// Завершение
-			{0x00, 0x00, 0x00}
+			//{0x00, 0x00, 0x00}
 };
 
 

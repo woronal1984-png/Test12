@@ -112,7 +112,7 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     //HAL_DCMI_Stop(hdcmi);
 
     frame_count++;
-
+    //HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
 }
 
 
@@ -132,7 +132,7 @@ uint32_t byte_idx;
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
-
+	line_count++;
 }
 
 
@@ -238,20 +238,20 @@ int main(void)
 	    if (g_frame_capture_complete) {
 	        g_frame_capture_complete = 0;
 
-	        raw8_bggr_to_rgb565_interpolated((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH, BAYER_HEIGHT);
+	        raw8_bggr_to_rgb565((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH ,BAYER_HEIGHT);
 	        // Обновить дисплей
-	        ST7735_DrawImage(10, 10, 80, 80, rgb_buffer);
+	        ST7735_DrawImage(10, 10, 80, 80,  rgb_buffer);
 
 	        // Небольшая задержка для визуального восприятия
-	        HAL_Delay(50);
+	        //HAL_Delay(50);
 
 
 	        //  Обнулим буфер изображения перед использованием
-	        memset(g_camera_frame, 0, sizeof(g_camera_frame));
+	        //memset(g_camera_frame, 0, sizeof(g_camera_frame));
 
 
 	        // Перезапустить захват, если он остановился
-	        OV5640_StartCapture();
+	        //OV5640_StartCapture();
 	    }
 
 

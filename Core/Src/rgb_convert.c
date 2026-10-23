@@ -9,7 +9,7 @@
 
 #include "rgb_convert.h"
 
-uint16_t rgb_buffer[RGB_BUFFER_SIZE] __attribute__((aligned(32)));
+uint16_t rgb_buffer[RGB_BUFFER_SIZE] __attribute__((aligned(16)));
 
 /**
  * Упаковка 8-битных RGB в 16-битный RGB565
