@@ -2115,9 +2115,9 @@ void OV5640_StartCapture(void) {
 
 
     // Запуск DMA
-    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_BUFFER_BYTES) != HAL_OK) {
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
  8000f7a:	4a09      	ldr	r2, [pc, #36]	@ (8000fa0 <OV5640_StartCapture+0x2c>)
- 8000f7c:	f44f 4396 	mov.w	r3, #19200	@ 0x4b00
+ 8000f7c:	f44f 5396 	mov.w	r3, #4800	@ 0x12c0
  8000f80:	2100      	movs	r1, #0
  8000f82:	4808      	ldr	r0, [pc, #32]	@ (8000fa4 <OV5640_StartCapture+0x30>)
  8000f84:	f001 fb7e 	bl	8002684 <HAL_DCMI_Start_DMA>
