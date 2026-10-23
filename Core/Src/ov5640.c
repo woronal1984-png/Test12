@@ -142,7 +142,7 @@ uint8_t OV5640_Init(void) {
 
 
 
-    uint32_t i;
+ /*   uint32_t i;
     for ( i = 0; i < ov5640_default_regs_size; i++)
         {
         	OV5640_WriteReg(ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1],
@@ -160,6 +160,28 @@ uint8_t OV5640_Init(void) {
                 for (volatile int d = 0; d < 5; d++);
             }
         }
+  */
+
+
+    for (uint32_t i = 0; i < ov5640_default_regs_size; i++)
+    {
+        uint16_t reg =
+            ((uint16_t)ov5640_default_regs[i][0] << 8) |
+            ov5640_default_regs[i][1];
+
+        uint8_t value = ov5640_default_regs[i][2];
+
+        if (OV5640_WriteReg(reg, value) != 0)
+        {
+            return 3;
+        }
+
+        if (reg == 0x3008)
+        {
+            HAL_Delay(20);
+        }
+    }
+
 
     // 4. ВКЛЮЧИТЬ КАМЕРУ (Software Power Up) - САМЫЙ ВАЖНЫЙ ШАГ!
     OV5640_WriteReg(0x3008, 0x02);
