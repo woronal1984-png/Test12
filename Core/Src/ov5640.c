@@ -194,7 +194,7 @@ void OV5640_StartCapture(void) {
 
 
     // Запуск DMA
-    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
+    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
         // Ошибка запуска DMA
     	int j=1;
         return;
