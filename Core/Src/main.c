@@ -75,7 +75,19 @@ static void MPU_Config(void);
 static uint16_t line_count = 0;
 static uint32_t frame_count = 0;
 static uint32_t vsync_count = 0;
-
+volatile uint32_t debug_dma_ndtr;
+volatile uint32_t debug_dma_state;
+volatile uint32_t debug_dma_error;
+volatile uint32_t debug_dcmi_error;
+volatile uint32_t dma_ndtr_at_frame;
+volatile uint32_t dma_state_at_frame;
+volatile uint32_t dma_ndtr_after_wait;
+volatile uint32_t frame_cr;
+volatile uint32_t frame_sr;
+volatile uint32_t frame_ris;
+volatile uint32_t frame_ndtr;
+volatile uint32_t frame_dma_error;
+volatile uint32_t frame_dcmi_error;
 
 /**
  * Ищет первое 32-битное слово, равное нулю.
@@ -108,9 +120,19 @@ bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Устанавливаем флаг, что кадр готов к обработке
     g_frame_capture_complete = 1;
+
+    frame_cr = DCMI->CR;
+        frame_sr = DCMI->SR;
+        frame_ris = DCMI->RISR;
+        frame_ndtr = __HAL_DMA_GET_COUNTER(hdcmi->DMA_Handle);
+        frame_dma_error = hdcmi->DMA_Handle->ErrorCode;
+        frame_dcmi_error = HAL_DCMI_GetError(hdcmi);
+
+
     // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
     //HAL_DCMI_Stop(hdcmi);
-
+    dma_ndtr_at_frame = __HAL_DMA_GET_COUNTER(hdcmi->DMA_Handle);
+       dma_state_at_frame = HAL_DMA_GetState(hdcmi->DMA_Handle);
     frame_count++;
     //HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
 }
@@ -120,10 +142,13 @@ void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
 /**
   * @brief Обработчик ошибок DCMI
   */
+volatile uint8_t g_camera_error = 0;
+
 void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
     // Можно зажечь светодиод ошибки или вывести сообщение в UART
     // Error handler
     //g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
+	g_camera_error = 1;
 }
 
 uint32_t idx;
@@ -206,6 +231,15 @@ int main(void)
           ST7735_DisplayString(10, 50, "Camera FAIL!", ST7735_WHITE, ST7735_BLACK);
           Error_Handler();
       }
+
+      volatile uint8_t test_write_status;
+      volatile uint8_t test_readback;
+
+      test_write_status = OV5640_WriteReg(0x4741, 0x05);
+      HAL_Delay(10);
+      test_readback = OV5640_ReadReg(0x4741);
+      HAL_Delay(20);
+
       // 5. Запуск захвата
       ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
 
@@ -213,8 +247,8 @@ int main(void)
      // Test_DMA_To_D2SRAM();
 
       //  Обнулим буфер изображения перед использованием
-      memset(g_camera_frame, 0, sizeof(g_camera_frame));
-
+//      memset(g_camera_frame, 0, sizeof(g_camera_frame));
+      memset(g_camera_frame, 0xA5, sizeof(g_camera_frame));
 
       hts_h = OV5640_ReadReg(0x380C);
       hts_l = OV5640_ReadReg(0x380D);
@@ -237,6 +271,13 @@ int main(void)
 
 	    if (g_frame_capture_complete) {
 	        g_frame_capture_complete = 0;
+
+	        debug_dma_ndtr = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+	        debug_dma_state  = (uint32_t)HAL_DMA_GetState(&hdma_dcmi);
+	        debug_dma_error  = hdma_dcmi.ErrorCode;
+	        debug_dcmi_error = HAL_DCMI_GetError(&hdcmi);
+	        dma_ndtr_after_wait = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+
 
 	        raw8_bggr_to_rgb565((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH ,BAYER_HEIGHT);
 	        // Обновить дисплей

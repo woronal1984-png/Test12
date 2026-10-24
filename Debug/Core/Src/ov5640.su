@@ -4,6 +4,6 @@
 ../Core/Src/ov5640.c:87:16:OV5640_WriteRegister	32	static
 ../Core/Src/ov5640.c:100:16:OV5640_ReadRegister	32	static
 ../Core/Src/ov5640.c:112:9:OV5640_ReadID	24	static
-../Core/Src/ov5640.c:122:9:OV5640_Init	32	static
-../Core/Src/ov5640.c:211:6:OV5640_StartCapture	16	static
-../Core/Src/ov5640.c:228:6:OV5640_StopCapture	8	static
+../Core/Src/ov5640.c:122:9:OV5640_Init	40	static
+../Core/Src/ov5640.c:235:6:OV5640_StartCapture	24	static
+../Core/Src/ov5640.c:287:6:OV5640_StopCapture	8	static

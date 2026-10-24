@@ -41,7 +41,7 @@ extern DCMI_HandleTypeDef hdcmi;
 void MX_DCMI_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-
+extern DMA_HandleTypeDef hdma_dcmi;
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

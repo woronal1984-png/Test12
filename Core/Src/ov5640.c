@@ -13,7 +13,7 @@
 
 // Глобальные переменные
 //uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((aligned(32)));
-uint32_t  g_camera_frame[IMAGE_BUFFER_BYTES] __attribute__((section(".camera_buffer"), aligned(32)));
+uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((section(".camera_buffer"), aligned(32)));
 
 // Прототипы
 static uint8_t OV5640_WriteRegister(uint16_t reg, uint8_t data);
@@ -184,7 +184,7 @@ uint8_t OV5640_Init(void) {
 
 
     // 4. ВКЛЮЧИТЬ КАМЕРУ (Software Power Up) - САМЫЙ ВАЖНЫЙ ШАГ!
-    OV5640_WriteReg(0x3008, 0x02);
+   // OV5640_WriteReg(0x3008, 0x02);
 
     HAL_Delay(100);
 
@@ -201,11 +201,35 @@ uint8_t OV5640_Init(void) {
     }
 
 
-
+    volatile uint8_t r3017 = OV5640_ReadReg(0x3017);
+    volatile uint8_t r3018 = OV5640_ReadReg(0x3018);
+    volatile uint8_t r300E = OV5640_ReadReg(0x300E);
+    volatile uint8_t r4300 = OV5640_ReadReg(0x4300);
+    volatile uint8_t r501F = OV5640_ReadReg(0x501F);
+    volatile uint8_t r5000 = OV5640_ReadReg(0x5000);
+    volatile uint8_t r5001 = OV5640_ReadReg(0x5001);
 
 
     return 0;
 }
+
+
+volatile uint32_t dcmi_cr;
+volatile uint32_t dcmi_sr;
+volatile uint32_t dma_cr;
+volatile uint32_t dma_ndtr_start;
+volatile uint32_t dcmi_mis;
+volatile uint32_t dcmi_ris;
+volatile uint32_t dma_ndtr_10ms;
+volatile uint32_t dma_ndtr_100ms;
+volatile uint32_t dma_samples[8];
+volatile uint32_t dcmi_samples[8];
+volatile uint32_t cr_after;
+volatile uint32_t sr_after;
+volatile uint32_t ris_after;
+volatile uint32_t ier_after;
+volatile uint32_t ndtr_after;
+volatile uint32_t dma_state_after;
 
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
@@ -214,13 +238,48 @@ void OV5640_StartCapture(void) {
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
 
-
+	HAL_StatusTypeDef capture_status;
+	capture_status = HAL_DCMI_Start_DMA(
+	    &hdcmi,
+	    DCMI_MODE_SNAPSHOT,
+	    (uint32_t)g_camera_frame,
+	    IMAGE_DMA_WORDS
+	);
     // Запуск DMA
-    if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
+   // if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
         // Ошибка запуска DMA
-    	int j=1;
-        return;
-    }
+   // 	int j=1;
+   //     return;
+   // }
+	for (uint32_t i = 0; i < 8; i++)
+	{
+	    dma_samples[i] = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+	    dcmi_samples[i] = DCMI->SR;
+
+	    HAL_Delay(20);
+	}
+
+	cr_after = DCMI->CR;
+	sr_after = DCMI->SR;
+	ris_after = DCMI->RISR;
+	ier_after = DCMI->IER;
+
+	ndtr_after = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+	dma_state_after = HAL_DMA_GetState(&hdma_dcmi);
+
+	HAL_Delay(10);
+	dma_ndtr_10ms = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+
+	HAL_Delay(90);
+	dma_ndtr_100ms = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+
+	dcmi_mis = DCMI->MISR;
+	dcmi_ris = DCMI->RISR;
+	dma_ndtr_start = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+	dcmi_cr = DCMI->CR;
+	dcmi_sr = DCMI->SR;
+	dma_cr = DMA1_Stream0->CR;
+
 
     int j=1;
 }

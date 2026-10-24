@@ -25,7 +25,7 @@
 
 
 // Массив uint16_t (каждый элемент = 1 пиксель)
-extern uint32_t  g_camera_frame[IMAGE_BUFFER_BYTES] __attribute__((section(".camera_buffer"), aligned(32)));
+extern uint32_t  g_camera_frame[IMAGE_DMA_WORDS] __attribute__((section(".camera_buffer"), aligned(32)));
 
 
 
