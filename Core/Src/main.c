@@ -88,6 +88,13 @@ volatile uint32_t frame_ris;
 volatile uint32_t frame_ndtr;
 volatile uint32_t frame_dma_error;
 volatile uint32_t frame_dcmi_error;
+volatile uint8_t debug_capture_done = 0;
+volatile uint32_t frame_callback_count = 0;
+volatile uint32_t line_callback_count = 0;
+volatile uint32_t vsync_callback_count = 0;
+
+
+
 
 /**
  * Ищет первое 32-битное слово, равное нулю.
@@ -110,7 +117,10 @@ bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index
     return false;
 }
 
-
+volatile uint32_t frame_ndtr;
+volatile uint32_t frame_risr;
+volatile uint32_t frame_dma_lisr;
+volatile uint32_t frame_dma_error;
 
 
 /**
@@ -120,19 +130,12 @@ bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Устанавливаем флаг, что кадр готов к обработке
     g_frame_capture_complete = 1;
-
-    frame_cr = DCMI->CR;
-        frame_sr = DCMI->SR;
-        frame_ris = DCMI->RISR;
-        frame_ndtr = __HAL_DMA_GET_COUNTER(hdcmi->DMA_Handle);
-        frame_dma_error = hdcmi->DMA_Handle->ErrorCode;
-        frame_dcmi_error = HAL_DCMI_GetError(hdcmi);
+    frame_callback_count++;
 
 
     // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
     //HAL_DCMI_Stop(hdcmi);
-    dma_ndtr_at_frame = __HAL_DMA_GET_COUNTER(hdcmi->DMA_Handle);
-       dma_state_at_frame = HAL_DMA_GetState(hdcmi->DMA_Handle);
+
     frame_count++;
     //HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
 }
@@ -158,6 +161,7 @@ void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 
 	line_count++;
+	line_callback_count++;
 }
 
 
@@ -165,6 +169,7 @@ void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Этот колбэк должен вызываться на каждый VSYNC
 
     vsync_count++;
+    vsync_callback_count++;
 }
 
 
@@ -257,7 +262,36 @@ int main(void)
 
       //Start_Camera_Capture();
       OV5640_StartCapture();
+      uint32_t timeout = HAL_GetTick() + 500;
+      while (DMA1_Stream0->NDTR != 0)
+      {
+          if ((int32_t)(HAL_GetTick() - timeout) >= 0)
+          {
+              break;
+          }
+      }
 
+      volatile uint32_t dbg_primask = __get_PRIMASK();
+
+      volatile uint32_t dbg_dma_iser =
+          NVIC->ISER[DMA1_Stream0_IRQn >> 5];
+
+      volatile uint32_t dbg_dcmi_iser =
+          NVIC->ISER[DCMI_IRQn >> 5];
+
+      volatile uint32_t dbg_dma_ispr =
+          NVIC->ISPR[DMA1_Stream0_IRQn >> 5];
+
+      volatile uint32_t dbg_dcmi_ispr =
+          NVIC->ISPR[DCMI_IRQn >> 5];
+
+      volatile uint32_t dbg_dma_ndtr = DMA1_Stream0->NDTR;
+      volatile uint32_t dbg_dma_cr = DMA1_Stream0->CR;
+      volatile uint32_t dbg_dma_lisr = DMA1->LISR;
+
+      volatile uint32_t dbg_dcmi_ier = DCMI->IER;
+      volatile uint32_t dbg_dcmi_risr = DCMI->RISR;
+      volatile uint32_t dbg_dcmi_misr = DCMI->MISR;
 
   /* USER CODE END 2 */
 

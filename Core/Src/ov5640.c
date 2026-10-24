@@ -239,49 +239,21 @@ void OV5640_StartCapture(void) {
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
 
 	HAL_StatusTypeDef capture_status;
+
+	volatile uint32_t ndtr_before = DMA1_Stream0->NDTR;
+
+
 	capture_status = HAL_DCMI_Start_DMA(
 	    &hdcmi,
 	    DCMI_MODE_SNAPSHOT,
 	    (uint32_t)g_camera_frame,
-	    IMAGE_DMA_WORDS
+		IMAGE_DMA_WORDS
 	);
-    // Запуск DMA
-   // if(HAL_DCMI_Start_DMA(&hdcmi, DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame, IMAGE_DMA_WORDS) != HAL_OK) {
-        // Ошибка запуска DMA
-   // 	int j=1;
-   //     return;
-   // }
-	for (uint32_t i = 0; i < 8; i++)
-	{
-	    dma_samples[i] = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-	    dcmi_samples[i] = DCMI->SR;
-
-	    HAL_Delay(20);
-	}
-
-	cr_after = DCMI->CR;
-	sr_after = DCMI->SR;
-	ris_after = DCMI->RISR;
-	ier_after = DCMI->IER;
-
-	ndtr_after = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-	dma_state_after = HAL_DMA_GetState(&hdma_dcmi);
-
-	HAL_Delay(10);
-	dma_ndtr_10ms = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-
-	HAL_Delay(90);
-	dma_ndtr_100ms = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-
-	dcmi_mis = DCMI->MISR;
-	dcmi_ris = DCMI->RISR;
-	dma_ndtr_start = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-	dcmi_cr = DCMI->CR;
-	dcmi_sr = DCMI->SR;
-	dma_cr = DMA1_Stream0->CR;
 
 
-    int j=1;
+
+
+	int j=1;
 }
 
 void OV5640_StopCapture(void) {
