@@ -25,6 +25,9 @@
 
 #include "ov5640.h"
 #include "dma.h"
+
+#include "dcmi.h"
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -251,7 +254,7 @@ void DMA1_Stream0_IRQHandler(void)
 void DCMI_IRQHandler(void)
 {
   /* USER CODE BEGIN DCMI_IRQn 0 */
-	debug_dcmi_irq_count++;
+
   /* USER CODE END DCMI_IRQn 0 */
   HAL_DCMI_IRQHandler(&hdcmi);
   /* USER CODE BEGIN DCMI_IRQn 1 */
@@ -284,6 +287,19 @@ void SPI4_IRQHandler(void)
   /* USER CODE BEGIN SPI4_IRQn 1 */
 
   /* USER CODE END SPI4_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMAMUX1 overrun interrupt.
+  */
+void DMAMUX1_OVR_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
+
+  /* USER CODE END DMAMUX1_OVR_IRQn 0 */
+  /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
+
+  /* USER CODE END DMAMUX1_OVR_IRQn 1 */
 }
 
 /* USER CODE BEGIN 1 */

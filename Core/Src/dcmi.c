@@ -41,7 +41,7 @@ void MX_DCMI_Init(void)
   hdcmi.Instance = DCMI;
   hdcmi.Init.SynchroMode = DCMI_SYNCHRO_HARDWARE;
   hdcmi.Init.PCKPolarity = DCMI_PCKPOLARITY_RISING;
-  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_HIGH;
+  hdcmi.Init.VSPolarity = DCMI_VSPOLARITY_LOW;
   hdcmi.Init.HSPolarity = DCMI_HSPOLARITY_LOW;
   hdcmi.Init.CaptureRate = DCMI_CR_ALL_FRAME;
   hdcmi.Init.ExtendedDataMode = DCMI_EXTEND_DATA_8B;
@@ -95,7 +95,7 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_0
                           |GPIO_PIN_1;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
     HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
@@ -116,14 +116,14 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
 
     GPIO_InitStruct.Pin = GPIO_PIN_6|GPIO_PIN_7;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     GPIO_InitStruct.Pin = GPIO_PIN_3;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    GPIO_InitStruct.Pull = GPIO_PULLUP;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
     GPIO_InitStruct.Alternate = GPIO_AF13_DCMI;
     HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
@@ -144,7 +144,7 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     hdma_dcmi.Init.MemInc = DMA_MINC_ENABLE;
     hdma_dcmi.Init.PeriphDataAlignment = DMA_PDATAALIGN_WORD;
     hdma_dcmi.Init.MemDataAlignment = DMA_MDATAALIGN_WORD;
-    hdma_dcmi.Init.Mode = DMA_NORMAL;
+    hdma_dcmi.Init.Mode = DMA_CIRCULAR;
     hdma_dcmi.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     hdma_dcmi.Init.FIFOMode = DMA_FIFOMODE_DISABLE;
     if (HAL_DMA_Init(&hdma_dcmi) != HAL_OK)
@@ -155,10 +155,9 @@ void HAL_DCMI_MspInit(DCMI_HandleTypeDef* dcmiHandle)
     __HAL_LINKDMA(dcmiHandle,DMA_Handle,hdma_dcmi);
 
     /* DCMI interrupt Init */
-    HAL_NVIC_SetPriority(DCMI_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(DCMI_IRQn, 2, 0);
     HAL_NVIC_EnableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspInit 1 */
-
 
 
   /* USER CODE END DCMI_MspInit 1 */
@@ -206,7 +205,7 @@ void HAL_DCMI_MspDeInit(DCMI_HandleTypeDef* dcmiHandle)
     /* DCMI interrupt Deinit */
     HAL_NVIC_DisableIRQ(DCMI_IRQn);
   /* USER CODE BEGIN DCMI_MspDeInit 1 */
-   // __HAL_RCC_DMA2_CLK_ENABLE();
+
   /* USER CODE END DCMI_MspDeInit 1 */
   }
 }

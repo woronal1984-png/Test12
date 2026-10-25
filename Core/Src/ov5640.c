@@ -137,30 +137,10 @@ uint8_t OV5640_Init(void) {
 
 
     // 2. Выключить питание (Software Power Down) на время всей остальной настройки
-    OV5640_WriteReg(0x3008, 0x42);
+    //OV5640_WriteReg(0x3008, 0x42);
     HAL_Delay(5);
 
 
-
- /*   uint32_t i;
-    for ( i = 0; i < ov5640_default_regs_size; i++)
-        {
-        	OV5640_WriteReg(ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1],
-                        ov5640_default_regs[i][2]);
-
-
-        	uint16_t reg_addr = ov5640_default_regs[i][0] << 8 | ov5640_default_regs[i][1];
-            // Можно добавить небольшую задержку для некоторых регистров
-            if (reg_addr == 0x3008) {
-                HAL_Delay(20);  // После выхода из сброса
-            } else if ((reg_addr >= 0x3034 && reg_addr <= 0x3037) || reg_addr == 0x3108) {
-                HAL_Delay(5);   // После настроек PLL
-            } else if ((reg_addr >= 0x3800 && reg_addr <= 0x3814)) {
-                // Для регистров таймингов - минимальная задержка
-                for (volatile int d = 0; d < 5; d++);
-            }
-        }
-  */
 
 
     for (uint32_t i = 0; i < ov5640_default_regs_size; i++)
@@ -201,35 +181,12 @@ uint8_t OV5640_Init(void) {
     }
 
 
-    volatile uint8_t r3017 = OV5640_ReadReg(0x3017);
-    volatile uint8_t r3018 = OV5640_ReadReg(0x3018);
-    volatile uint8_t r300E = OV5640_ReadReg(0x300E);
-    volatile uint8_t r4300 = OV5640_ReadReg(0x4300);
-    volatile uint8_t r501F = OV5640_ReadReg(0x501F);
-    volatile uint8_t r5000 = OV5640_ReadReg(0x5000);
-    volatile uint8_t r5001 = OV5640_ReadReg(0x5001);
-
 
     return 0;
 }
 
 
-volatile uint32_t dcmi_cr;
-volatile uint32_t dcmi_sr;
-volatile uint32_t dma_cr;
-volatile uint32_t dma_ndtr_start;
-volatile uint32_t dcmi_mis;
-volatile uint32_t dcmi_ris;
-volatile uint32_t dma_ndtr_10ms;
-volatile uint32_t dma_ndtr_100ms;
-volatile uint32_t dma_samples[8];
-volatile uint32_t dcmi_samples[8];
-volatile uint32_t cr_after;
-volatile uint32_t sr_after;
-volatile uint32_t ris_after;
-volatile uint32_t ier_after;
-volatile uint32_t ndtr_after;
-volatile uint32_t dma_state_after;
+
 
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
@@ -239,17 +196,7 @@ void OV5640_StartCapture(void) {
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
 
 	HAL_StatusTypeDef capture_status;
-
-	volatile uint32_t ndtr_before = DMA1_Stream0->NDTR;
-
-
-	capture_status = HAL_DCMI_Start_DMA(
-	    &hdcmi,
-	    DCMI_MODE_SNAPSHOT,
-	    (uint32_t)g_camera_frame,
-		IMAGE_DMA_WORDS
-	);
-
+	capture_status = HAL_DCMI_Start_DMA(&hdcmi,DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame,IMAGE_DMA_WORDS);
 
 
 

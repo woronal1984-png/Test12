@@ -75,23 +75,6 @@ static void MPU_Config(void);
 static uint16_t line_count = 0;
 static uint32_t frame_count = 0;
 static uint32_t vsync_count = 0;
-volatile uint32_t debug_dma_ndtr;
-volatile uint32_t debug_dma_state;
-volatile uint32_t debug_dma_error;
-volatile uint32_t debug_dcmi_error;
-volatile uint32_t dma_ndtr_at_frame;
-volatile uint32_t dma_state_at_frame;
-volatile uint32_t dma_ndtr_after_wait;
-volatile uint32_t frame_cr;
-volatile uint32_t frame_sr;
-volatile uint32_t frame_ris;
-volatile uint32_t frame_ndtr;
-volatile uint32_t frame_dma_error;
-volatile uint32_t frame_dcmi_error;
-volatile uint8_t debug_capture_done = 0;
-volatile uint32_t frame_callback_count = 0;
-volatile uint32_t line_callback_count = 0;
-volatile uint32_t vsync_callback_count = 0;
 
 
 
@@ -117,10 +100,7 @@ bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index
     return false;
 }
 
-volatile uint32_t frame_ndtr;
-volatile uint32_t frame_risr;
-volatile uint32_t frame_dma_lisr;
-volatile uint32_t frame_dma_error;
+
 
 
 /**
@@ -128,16 +108,10 @@ volatile uint32_t frame_dma_error;
   * HAL вызовет эту функцию, когда передача данных закончится
   */
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
-    // Устанавливаем флаг, что кадр готов к обработке
-    g_frame_capture_complete = 1;
-    frame_callback_count++;
-
-
-    // Останавливаем захват, если он был в режиме Snapshot (для экономии энергии)
-    //HAL_DCMI_Stop(hdcmi);
-
     frame_count++;
+    g_frame_capture_complete = 1;
     //HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
+
 }
 
 
@@ -159,22 +133,17 @@ uint32_t byte_idx;
 // Добавим DMA callback для отладки
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
-
 	line_count++;
-	line_callback_count++;
 }
 
 
 void HAL_DCMI_VsyncEventCallback(DCMI_HandleTypeDef *hdcmi) {
     // Этот колбэк должен вызываться на каждый VSYNC
-
     vsync_count++;
-    vsync_callback_count++;
 }
 
 
 
-volatile uint8_t hts_h, hts_l, vts_h, vts_l;
 
 /* USER CODE END 0 */
 
@@ -237,61 +206,19 @@ int main(void)
           Error_Handler();
       }
 
-      volatile uint8_t test_write_status;
-      volatile uint8_t test_readback;
-
-      test_write_status = OV5640_WriteReg(0x4741, 0x05);
-      HAL_Delay(10);
-      test_readback = OV5640_ReadReg(0x4741);
-      HAL_Delay(20);
 
       // 5. Запуск захвата
       ST7735_DisplayString(10, 70, "Start capture...", ST7735_WHITE, ST7735_BLACK);
 
 
-     // Test_DMA_To_D2SRAM();
+
 
       //  Обнулим буфер изображения перед использованием
 //      memset(g_camera_frame, 0, sizeof(g_camera_frame));
       memset(g_camera_frame, 0xA5, sizeof(g_camera_frame));
 
-      hts_h = OV5640_ReadReg(0x380C);
-      hts_l = OV5640_ReadReg(0x380D);
-      vts_h = OV5640_ReadReg(0x380E);
-      vts_l = OV5640_ReadReg(0x380F);
 
-      //Start_Camera_Capture();
       OV5640_StartCapture();
-      uint32_t timeout = HAL_GetTick() + 500;
-      while (DMA1_Stream0->NDTR != 0)
-      {
-          if ((int32_t)(HAL_GetTick() - timeout) >= 0)
-          {
-              break;
-          }
-      }
-
-      volatile uint32_t dbg_primask = __get_PRIMASK();
-
-      volatile uint32_t dbg_dma_iser =
-          NVIC->ISER[DMA1_Stream0_IRQn >> 5];
-
-      volatile uint32_t dbg_dcmi_iser =
-          NVIC->ISER[DCMI_IRQn >> 5];
-
-      volatile uint32_t dbg_dma_ispr =
-          NVIC->ISPR[DMA1_Stream0_IRQn >> 5];
-
-      volatile uint32_t dbg_dcmi_ispr =
-          NVIC->ISPR[DCMI_IRQn >> 5];
-
-      volatile uint32_t dbg_dma_ndtr = DMA1_Stream0->NDTR;
-      volatile uint32_t dbg_dma_cr = DMA1_Stream0->CR;
-      volatile uint32_t dbg_dma_lisr = DMA1->LISR;
-
-      volatile uint32_t dbg_dcmi_ier = DCMI->IER;
-      volatile uint32_t dbg_dcmi_risr = DCMI->RISR;
-      volatile uint32_t dbg_dcmi_misr = DCMI->MISR;
 
   /* USER CODE END 2 */
 
@@ -306,11 +233,7 @@ int main(void)
 	    if (g_frame_capture_complete) {
 	        g_frame_capture_complete = 0;
 
-	        debug_dma_ndtr = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
-	        debug_dma_state  = (uint32_t)HAL_DMA_GetState(&hdma_dcmi);
-	        debug_dma_error  = hdma_dcmi.ErrorCode;
-	        debug_dcmi_error = HAL_DCMI_GetError(&hdcmi);
-	        dma_ndtr_after_wait = __HAL_DMA_GET_COUNTER(&hdma_dcmi);
+
 
 
 	        raw8_bggr_to_rgb565((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH ,BAYER_HEIGHT);
@@ -326,7 +249,7 @@ int main(void)
 
 
 	        // Перезапустить захват, если он остановился
-	        //OV5640_StartCapture();
+	       // OV5640_StartCapture();
 	    }
 
 
