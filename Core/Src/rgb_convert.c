@@ -22,6 +22,59 @@ static inline uint16_t pack_rgb565(uint8_t r, uint8_t g, uint8_t b)
     return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
+
+
+#define DOWNSCALE   10                       /* чётное, иначе собьётся Байер */
+#define CELLS       ((DOWNSCALE / 2) * (DOWNSCALE / 2))
+
+void raw8_bggr_to_rgb565(const uint32_t *bayer, uint16_t *rgb,
+                         uint16_t src_width, uint16_t src_height)
+{
+    const uint8_t *raw = (const uint8_t *)bayer;   /* байтовый доступ без raw_byte() */
+
+    const uint16_t out_width  = src_width  / DOWNSCALE;
+    const uint16_t out_height = src_height / DOWNSCALE;
+
+    for (uint16_t y = 0; y < out_height; y++)
+    {
+        for (uint16_t x = 0; x < out_width; x++)
+        {
+            uint32_t sum_b = 0, sum_g = 0, sum_r = 0;
+
+            for (uint16_t j = 0; j < DOWNSCALE; j += 2)
+            {
+                const uint8_t *p0 = raw + (uint32_t)(y * DOWNSCALE + j)     * src_width
+                                        + (uint32_t)x * DOWNSCALE;
+                const uint8_t *p1 = p0 + src_width;
+
+                for (uint16_t i = 0; i < DOWNSCALE; i += 2)
+                {
+                    sum_b += p0[i];                 /* B  G */
+                    sum_g += p0[i + 1] + p1[i];     /* G  R */
+                    sum_r += p1[i + 1];
+                }
+            }
+
+            const uint8_t b = (uint8_t)(sum_b / CELLS);
+            const uint8_t g = (uint8_t)(sum_g / (CELLS * 2));
+            const uint8_t r = (uint8_t)(sum_r / CELLS);
+
+            rgb[(uint32_t)y * out_width + x] = pack_rgb565(r, g, b);
+        }
+    }
+}
+
+
+
+
+
+
+
+static inline uint8_t raw_byte(const uint32_t *buf, uint32_t idx)
+{
+    return (uint8_t)(buf[idx >> 2] >> ((idx & 3u) * 8u));  // little-endian
+}
+
 /**
  * Демозаикинг RAW8 (BGGR) в RGB565.
  * Обрабатывает блоки 2x2, выходное разрешение вдвое меньше.
@@ -31,36 +84,30 @@ static inline uint16_t pack_rgb565(uint8_t r, uint8_t g, uint8_t b)
  * @param src_width Ширина исходного Bayer-изображения
  * @param src_height Высота исходного Bayer-изображения
  */
-void raw8_bggr_to_rgb565(const uint8_t *bayer, uint16_t *rgb,
+
+void raw8_bggr_to_rgb565_1(const uint32_t *bayer, uint16_t *rgb,
                          uint16_t src_width, uint16_t src_height)
 {
-    const uint16_t out_width = src_width / 2;
-    const uint16_t out_height = src_height / 2;
+    const uint16_t out_width  = src_width  / 10;
+    const uint16_t out_height = src_height / 10;
 
     for (uint16_t y = 0; y < out_height; y++)
     {
-        // Две строки Bayer, соответствующие одной строке выходного изображения
-        const uint8_t *row0 = bayer + (2 * y) * src_width;
-        const uint8_t *row1 = bayer + (2 * y + 1) * src_width;
+        const uint32_t row0 = (uint32_t)(y * 10)       * src_width;
+        const uint32_t row1 = (uint32_t)(y * 10 + 1)   * src_width;
 
         for (uint16_t x = 0; x < out_width; x++)
         {
-            // Позиции в блоке 2x2
-            // row0[x*2 + 0] = B
-            // row0[x*2 + 1] = G
-            // row1[x*2 + 0] = G
-            // row1[x*2 + 1] = R
+            const uint32_t sx = (uint32_t)x * 10;
 
-            uint8_t b = row0[x * 2 + 0];       // B
-            uint8_t g1 = row0[x * 2 + 1];      // G
-            uint8_t g2 = row1[x * 2 + 0];      // G
-            uint8_t r = row1[x * 2 + 1];       // R
+            uint8_t b  = raw_byte(bayer, row0 + sx + 0);
+            uint8_t g1 = raw_byte(bayer, row0 + sx + 1);
+            uint8_t g2 = raw_byte(bayer, row1 + sx + 0);
+            uint8_t r  = raw_byte(bayer, row1 + sx + 1);
 
-            // Средний зелёный
             uint8_t g = (uint8_t)(((uint16_t)g1 + g2) >> 1);
 
-            // Упаковка в RGB565
-            rgb[y * out_width + x] = pack_rgb565(r, g, b);
+            rgb[(uint32_t)y * out_width + x] = pack_rgb565(r, g, b);
         }
     }
 }

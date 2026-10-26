@@ -1,0 +1,10 @@
+../Core/Src/main.c:90:6:find_first_zero_word	8	static
+../Core/Src/main.c:110:6:HAL_DCMI_FrameEventCallback	0	static
+../Core/Src/main.c:124:6:HAL_DCMI_ErrorCallback	0	static
+../Core/Src/main.c:134:6:HAL_DCMI_LineEventCallback	0	static
+../Core/Src/main.c:140:6:HAL_DCMI_VsyncEventCallback	0	static
+../Core/Src/main.c:272:6:SystemClock_Config	128	static,ignoring_inline_asm
+../Core/Src/main.c:332:6:PeriphCommonClock_Config	200	static,ignoring_inline_asm
+../Core/Src/main.c:154:5:main	32	static,ignoring_inline_asm
+../Core/Src/main.c:396:6:Error_Handler	0	static,ignoring_inline_asm
+../Core/Src/main.c:414:6:assert_failed	0	static

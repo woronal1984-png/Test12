@@ -11,17 +11,17 @@
 
 
 // Размеры кадра (VGA)
-#define IMAGE_WIDTH 160
-#define IMAGE_HEIGHT 120
+#define IMAGE_WIDTH 500
+#define IMAGE_HEIGHT 500
 
 // Количество пикселей
-#define IMAGE_PIXELS  (IMAGE_WIDTH * IMAGE_HEIGHT)  // 19 200 pixel
+#define IMAGE_PIXELS  (IMAGE_WIDTH * IMAGE_HEIGHT)  // 250 000 pixel
 
 // Размер буфера в байтах (RAW = 1 байт на пиксель)
-#define IMAGE_BUFFER_BYTES  (IMAGE_PIXELS * 1)  // 19 200 байт
+#define IMAGE_BUFFER_BYTES  (IMAGE_PIXELS * 1)  // 250 000 байт
 
 // Размер для DMA в 32-битных словах
-#define IMAGE_DMA_WORDS  (IMAGE_BUFFER_BYTES / 4)  // 4 800 слов
+#define IMAGE_DMA_WORDS  (IMAGE_BUFFER_BYTES / 4)  // 62 500 слов
 
 
 // Массив uint16_t (каждый элемент = 1 пиксель)

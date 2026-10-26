@@ -180,27 +180,23 @@ uint8_t OV5640_Init(void) {
         return 2; // Неверный ID (возможно, другая камера)
     }
 
-
+    uint16_t q = 0;
+        q = OV5640_ReadReg(0x4740); // Читаем старший байт PID
 
     return 0;
 }
 
 
 
-
 // Запуск захвата DMA через HAL
 void OV5640_StartCapture(void) {
-    //g_frame_capture_complete = 0;
 
     // Запуск DCMI в режиме одиночного снимка (Snapshot) DCMI_MODE_SNAPSHOT   DCMI_MODE_CONTINUOUS
     // Адрес буфера, размер в байтах (преобразуем кол-во пикселов -> байты)
 
 	HAL_StatusTypeDef capture_status;
-	capture_status = HAL_DCMI_Start_DMA(&hdcmi,DCMI_MODE_CONTINUOUS, (uint32_t)g_camera_frame,IMAGE_DMA_WORDS);
+	capture_status = HAL_DCMI_Start_DMA(&hdcmi,DCMI_MODE_SNAPSHOT, (uint32_t)g_camera_frame,IMAGE_DMA_WORDS);
 
-
-
-	int j=1;
 }
 
 void OV5640_StopCapture(void) {

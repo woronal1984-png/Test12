@@ -1,0 +1,2 @@
+../Core/Src/rgb_convert.c:34:6:raw8_bggr_to_rgb565	48	static
+../Core/Src/rgb_convert.c:72:6:raw8_bggr_to_rgb565_interpolated	96	static

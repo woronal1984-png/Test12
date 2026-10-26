@@ -47,8 +47,7 @@ extern DMA_HandleTypeDef hdma_dcmi;
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-volatile uint32_t debug_dcmi_irq_count = 0;
-volatile uint32_t debug_dma_irq_count = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -240,7 +239,7 @@ void RCC_IRQHandler(void)
 void DMA1_Stream0_IRQHandler(void)
 {
   /* USER CODE BEGIN DMA1_Stream0_IRQn 0 */
-	debug_dma_irq_count++;
+
   /* USER CODE END DMA1_Stream0_IRQn 0 */
   HAL_DMA_IRQHandler(&hdma_dcmi);
   /* USER CODE BEGIN DMA1_Stream0_IRQn 1 */
@@ -297,6 +296,8 @@ void DMAMUX1_OVR_IRQHandler(void)
   /* USER CODE BEGIN DMAMUX1_OVR_IRQn 0 */
 
   /* USER CODE END DMAMUX1_OVR_IRQn 0 */
+  // Handle DMA1_Stream0
+  HAL_DMAEx_MUX_IRQHandler(&hdma_dcmi);
   /* USER CODE BEGIN DMAMUX1_OVR_IRQn 1 */
 
   /* USER CODE END DMAMUX1_OVR_IRQn 1 */

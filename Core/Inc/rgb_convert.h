@@ -10,12 +10,12 @@
 #define INC_RGB_CONVERT_H_
 
 // Размеры исходного Bayer-изображения
-#define BAYER_WIDTH   160
-#define BAYER_HEIGHT  120
+#define BAYER_WIDTH   50
+#define BAYER_HEIGHT  50
 
 // Размеры выходного RGB565 (вдвое меньше)
-#define RGB_WIDTH     (BAYER_WIDTH / 2)
-#define RGB_HEIGHT    (BAYER_HEIGHT / 2)
+#define RGB_WIDTH     (BAYER_WIDTH  )
+#define RGB_HEIGHT    (BAYER_HEIGHT  )
 #define RGB_BUFFER_SIZE (RGB_WIDTH * RGB_HEIGHT)
 
 // Буфер RGB565
@@ -31,7 +31,7 @@ extern uint16_t rgb_buffer[RGB_BUFFER_SIZE] __attribute__((aligned(16)));
  * @param src_width Ширина исходного Bayer-изображения
  * @param src_height Высота исходного Bayer-изображения
  */
-void raw8_bggr_to_rgb565(const uint8_t *bayer, uint16_t *rgb, uint16_t src_width, uint16_t src_height);
+void raw8_bggr_to_rgb565(const uint32_t *bayer, uint16_t *rgb, uint16_t src_width, uint16_t src_height);
 
 /**
  * Версия с усреднением по 4 соседним пикселям для лучшего качества.

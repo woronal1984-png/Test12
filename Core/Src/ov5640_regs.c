@@ -51,27 +51,41 @@ const uint8_t ov5640_default_regs[][3] = {
 
 //Настройки PLL, HTS/VTS и AEC
 			{0x30, 0x34, 0x18},    //18 Bit[6:4]: PLL charge pump control Bit[3:0]: MIPI bit mode 0xA: 10-bit mode Настройка PLL (10-битный режим).
-			{0x30, 0x35, 0x41},    //21 Настройки PLL  SysDiv (p_div) — системный делитель (старшие биты 0x3035[7:4])
-			{0x30, 0x36, 0x62},    //30 Настройки PLL  Множитель PLL (4~252) Может быть любым целым числом от 4 до 127 и только четным числом от 128 до 252
-			{0x30, 0x37, 0x11},    //12 Настройки PLL  (предделитель) [citation:5]
+			{0x30, 0x35, 0x21},    //21 Настройки PLL  SysDiv (p_div) — системный делитель (старшие биты 0x3035[7:4])
+			//Bits [7:4] — PLL SysDiv (системный делитель, p_div). Делитель частоты VCO для получения SysClk (клок ISP и тайминг-генератора). Значение 0x2 (старший ниббл 2 из 0x21) → делитель = 2. То есть SysClk = VCO / 2.
+			//Bits [3:0] — MIPI divider (MipiDiv). Делитель VCO для получения MipiClk. Значение 0x1 (младший ниббл 1) → делитель = 1, т.е. MipiClk = VCO / 1
+			{0x30, 0x36, 0x30},    //30 Настройки PLL  Множитель PLL (4~252) Может быть любым целым числом от 4 до 127 и только четным числом от 128 до 252
+			// PLL multiplier (N) — коэффициент умножения PLL. 8-битное поле [7:0]
+			{0x30, 0x37, 0x12},    //12 Настройки PLL  (предделитель) [citation:5]
+			//Bits [3:0] — PLL pre-divider (pre_div, иногда называется p_div входной). Делитель входного клока XVCLK перед подачей на фазовый детектор. Значение 0x2 (младший ниббл 2 из 0x12) → предделитель = 2
+			//Bit [4] — PLL bypass / PLL root divider? В разных ревизиях документации бит 4 может обозначать дополнительный делитель или режим. В данном случае 0x12 = 0001 0010: бит 4 = 1, младший ниббл = 2. Бит 4 часто трактуется как PLL root divider (делитель 2 на выходе PLL) или как бит выбора режима — уточняется по таблице 7-1
+			//VCO = XVCLK × (PLL_multiplier) / (pre_div × sys_div_входной?)
+			//SysClk = VCO / SysDiv (p_div)
+			//MipiClk = VCO / MipiDiv
 			{0x30, 0x39, 0x00},    // PLL Bypass выключен
-			{0x38, 0x0c, 0x0c},    // HTS  > X_ADDR_END
-			{0x38, 0x0d, 0x80},    // HTS  > X_ADDR_END + 600 на затухание
-			{0x38, 0x0e, 0x07},    // VTS  > Y_ADDR_END
-			{0x38, 0x0f, 0x1c},    // VTS  > Y_ADDR_END + 15 на затухание
+			//Bit [7] = 0 → PLL включён (bypass выключен), сенсор тактуется от VCO
+			//Bit [7] = 1 → PLL обойдён (bypass), SysClk/MipiClk берутся напрямую от XVCLK (или делённого XVCLK), без умножения
+			//{0x38, 0x0c, 0x06},    // HTS  > X_ADDR_END
+			//{0x38, 0x0d, 0x72},    // HTS  > X_ADDR_END + 600 на затухание
+			//{0x38, 0x0e, 0x02},    // VTS  > Y_ADDR_END
+			//{0x38, 0x0f, 0x08},    // VTS  > Y_ADDR_END + 15 на затухание
+			{0x38, 0x0c, 0x09},    // HTS  > X_ADDR_END
+			{0x38, 0x0d, 0xc4},    // HTS  > X_ADDR_END + 600 на затухание
+			{0x38, 0x0e, 0x06},    // VTS  > Y_ADDR_END
+			{0x38, 0x0f, 0xcc},    // VTS  > Y_ADDR_END + 15 на затухание
 			{0x3c, 0x01, 0xb4},    // Настройка детектора 50/60 Гц
 			{0x3c, 0x00, 0x04},    // Настройка детектора 50/60 Гц
-			{0x3a, 0x08, 0x00},    //1 Band step для 60 Гц (старший байт)
-			{0x3a, 0x09, 0x93},	   //48 Band step для 60 Гц (младший байт)
-			{0x3a, 0x0e, 0x06},    //3 Настройка AEC
+			{0x3a, 0x08, 0x01},    //1 Band step для 60 Гц (старший байт)
+			{0x3a, 0x09, 0x27},	   //48 Band step для 60 Гц (младший байт)
+			{0x3a, 0x0e, 0x03},    //3 Настройка AEC
 			{0x3a, 0x0a, 0x00},    // Band step для 50 Гц (старший байт)
-			{0x3a, 0x0b, 0x7b},    //c0 Band step для 50 Гц (младший байт)
-			{0x3a, 0x0d, 0x08},    //4 Настройка AEC
+			{0x3a, 0x0b, 0xf6},    //c0 Band step для 50 Гц (младший байт)
+			{0x3a, 0x0d, 0x04},    //4 Настройка AEC
 			{0x3a, 0x00, 0x38},    // Управление AEC (night mode и banding)
-			{0x3a, 0x02, 0x05},    //2 Night mode ceiling (60 Гц)
-			{0x3a, 0x03, 0xc4},	   //e0 Night mode ceiling (60 Гц)
-			{0x3a, 0x14, 0x05},    //4  Night mode ceiling (50 Гц).
-			{0x3a, 0x15, 0xc4},    //60  Night mode ceiling (50 Гц).
+			{0x3a, 0x02, 0x03},    //2 Night mode ceiling (60 Гц)
+			{0x3a, 0x03, 0xd8},	   //e0 Night mode ceiling (60 Гц)
+			{0x3a, 0x14, 0x03},    //4  Night mode ceiling (50 Гц).
+			{0x3a, 0x15, 0xd8},    //60  Night mode ceiling (50 Гц).
 
 //---------------------------------
 
@@ -84,6 +98,7 @@ const uint8_t ov5640_default_regs[][3] = {
 			{0x37, 0x0c, 0x03},  // Настройка таймингов
 			{0x40, 0x01, 0x02},  // BLC (Black Level Calibration) control
 			{0x40, 0x04, 0x02},  // BLC line number
+			{0x44, 0x07, 0x04},
 			{0x30, 0x00, 0x00},  // Настройка системы
 			{0x30, 0x02, 0x1c},  // Настройка системы
 			{0x30, 0x04, 0xff},  // Настройка системы (MCU on)
@@ -98,7 +113,7 @@ const uint8_t ov5640_default_regs[][3] = {
 		    {0x43, 0x00, 0x00},  // Выбор формата RAW с обходом ISP.  [7:4] в 0xF (обход форматтера) [3:0] в 0x8 (выбор формата RAW)
 			{0x50, 0x1f, 0x03},  // Настройка ISP в режим RAW (было 0x01 для RGB)
 			{0x50, 0x00, 0x00},  // Отключаем функции ISP
-			{0x50, 0x01, 0xa3},  // Включение SCL (Scaling) в ISP
+			{0x50, 0x01, 0xa3},  // 0xa3 Включение SCL (Scaling) в ISP
 			{0x46, 0x0b, 0x35},  // Настройка VFIFO
 			{0x46, 0x0c, 0x20},  // Настройка VFIFO
 			{0x38, 0x24, 0x02},  // Настройка PCLK divider
@@ -129,24 +144,32 @@ const uint8_t ov5640_default_regs[][3] = {
 
 
 //Настройки зеркала, окна и выходного разрешения
-			{0x38, 0x20, 0x47}, //40 Управление flip (вертикальное отражение)
+			{0x38, 0x20, 0x41}, //40 Управление flip (вертикальное отражение)
 			{0x38, 0x21, 0x01}, //0 Управление mirror (горизонтальное отражение) и бинингом Бит [0]   Значение 1 — включен, 0 — выключен.
-			{0x38, 0x00, 0x00}, //X_ADDR_ST 0
-			{0x38, 0x01, 0x00}, //X_ADDR_ST 0
-			{0x38, 0x02, 0x00}, //Y_ADDR_ST 0
-			{0x38, 0x03, 0x04}, //Y_ADDR_ST 0
-			{0x38, 0x04, 0x0a}, // X_ADDR_END
-			{0x38, 0x05, 0x3f}, // X_ADDR_END = ( X_ADDR_ST + X_OFFSET + X_OUTPUT_SIZE )  2623
-			{0x38, 0x06, 0x07}, // Y_ADDR_END
-			{0x38, 0x07, 0x9b}, // Y_ADDR_END = ( Y_ADDR_ST + Y_OFFSET + Y_OUTPUT_SIZE  ) 1764
-			{0x38, 0x08, 0x00}, // X_OUTPUT_SIZE
-			{0x38, 0x09, 0xa0}, // X_OUTPUT_SIZE 160
-			{0x38, 0x0a, 0x00}, // Y_OUTPUT_SIZE
-			{0x38, 0x0b, 0x78}, // Y_OUTPUT_SIZE 120
+			//{0x38, 0x00, 0x04}, //X_ADDR_ST 0  1044
+			//{0x38, 0x01, 0x14}, //X_ADDR_ST 0
+			//{0x38, 0x02, 0x02}, //Y_ADDR_ST 0  720
+			//{0x38, 0x03, 0xd0}, //Y_ADDR_ST 0
+			//{0x38, 0x04, 0x06}, // X_ADDR_END
+			//{0x38, 0x05, 0x07}, // X_ADDR_END = ( X_ADDR_ST + X_OFFSET + X_OUTPUT_SIZE )  2623 (исх 2592)  для 500 (1044 + 0 + 500)
+			//{0x38, 0x06, 0x04}, // Y_ADDR_END
+			//{0x38, 0x07, 0xc3}, // Y_ADDR_END = ( Y_ADDR_ST + Y_OFFSET + Y_OUTPUT_SIZE  ) 1764 (исх 1944)  для 500 (720 + 0 + 500 )
+			{0x38, 0x00, 0x03}, //X_ADDR_ST 0  796
+			{0x38, 0x01, 0x1c}, //X_ADDR_ST 0
+			{0x38, 0x02, 0x01}, //Y_ADDR_ST 0  472
+			{0x38, 0x03, 0xd8}, //Y_ADDR_ST 0
+			{0x38, 0x04, 0x07}, // X_ADDR_END
+			{0x38, 0x05, 0x03}, // X_ADDR_END = ( X_ADDR_ST + X_OFFSET + X_OUTPUT_SIZE )   (исх 2592)  для 500 (796 + 0 + 1000 = 1795)
+			{0x38, 0x06, 0x05}, // Y_ADDR_END
+			{0x38, 0x07, 0xbf}, // Y_ADDR_END = ( Y_ADDR_ST + Y_OFFSET + Y_OUTPUT_SIZE  )  (исх 1944)  для 500 (472 + 0 + 1000 = 1471 )
+			{0x38, 0x08, 0x01}, // X_OUTPUT_SIZE
+			{0x38, 0x09, 0xf4}, // X_OUTPUT_SIZE 500
+			{0x38, 0x0a, 0x01}, // Y_OUTPUT_SIZE
+			{0x38, 0x0b, 0xf4}, // Y_OUTPUT_SIZE 500
 			{0x38, 0x10, 0x00}, //X_OFFSET  0
-			{0x38, 0x11, 0x10}, //X_OFFSET  0
+			{0x38, 0x11, 0x00}, //X_OFFSET  0
 			{0x38, 0x12, 0x00}, //Y_OFFSET  0
-			{0x38, 0x13, 0x06}, //Y_OFFSET  0
+			{0x38, 0x13, 0x00}, //Y_OFFSET  0
 			{0x38, 0x14, 0x31}, //Шаг прореживания для пикселей.
 			{0x38, 0x15, 0x31}, //Шаг прореживания для пикселей.
 

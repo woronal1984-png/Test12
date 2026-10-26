@@ -72,10 +72,11 @@ static void MPU_Config(void);
 /* USER CODE BEGIN 0 */
 
 
-static uint16_t line_count = 0;
-static uint32_t frame_count = 0;
-static uint32_t vsync_count = 0;
-
+uint16_t line_count = 0;
+uint32_t frame_count = 0;
+uint32_t vsync_count = 0;
+volatile uint32_t dbg_lines_per_frame;
+volatile uint32_t dbg_vsync_per_frame;
 
 
 
@@ -110,7 +111,7 @@ bool find_first_zero_word(const uint32_t *buffer, uint32_t size, uint32_t *index
 void HAL_DCMI_FrameEventCallback(DCMI_HandleTypeDef *hdcmi) {
     frame_count++;
     g_frame_capture_complete = 1;
-    //HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
+    HAL_DCMI_Stop(hdcmi);   // остановить всё чисто
 
 }
 
@@ -125,15 +126,15 @@ void HAL_DCMI_ErrorCallback(DCMI_HandleTypeDef *hdcmi) {
     // Можно зажечь светодиод ошибки или вывести сообщение в UART
     // Error handler
     //g_frame_capture_complete = 0xFF; // Специальное значение для ошибки
-	g_camera_error = 1;
+	g_camera_error ++;
 }
 
-uint32_t idx;
-uint32_t byte_idx;
+
 // Добавим DMA callback для отладки
 void HAL_DCMI_LineEventCallback (DCMI_HandleTypeDef *hdcmi) {
     // Этот коллбэк вызывается на каждую строку
 	line_count++;
+
 }
 
 
@@ -214,8 +215,8 @@ int main(void)
 
 
       //  Обнулим буфер изображения перед использованием
-//      memset(g_camera_frame, 0, sizeof(g_camera_frame));
-      memset(g_camera_frame, 0xA5, sizeof(g_camera_frame));
+      memset(g_camera_frame, 0, sizeof(g_camera_frame));
+//      memset(g_camera_frame, 0xA5, sizeof(g_camera_frame));
 
 
       OV5640_StartCapture();
@@ -236,9 +237,9 @@ int main(void)
 
 
 
-	        raw8_bggr_to_rgb565((uint8_t*)g_camera_frame, rgb_buffer, BAYER_WIDTH ,BAYER_HEIGHT);
+	        raw8_bggr_to_rgb565(g_camera_frame, rgb_buffer, 500, 500);
 	        // Обновить дисплей
-	        ST7735_DrawImage(10, 10, 80, 80,  rgb_buffer);
+	        ST7735_DrawImage(20, 20, 50, 50,  rgb_buffer);
 
 	        // Небольшая задержка для визуального восприятия
 	        //HAL_Delay(50);
@@ -249,7 +250,7 @@ int main(void)
 
 
 	        // Перезапустить захват, если он остановился
-	       // OV5640_StartCapture();
+	        OV5640_StartCapture();
 	    }
 
 

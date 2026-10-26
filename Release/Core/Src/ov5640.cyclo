@@ -1,0 +1,8 @@
+../Core/Src/ov5640.c:100:16:OV5640_ReadRegister	2
+../Core/Src/ov5640.c:31:9:OV5640_WriteReg	1
+../Core/Src/ov5640.c:53:9:OV5640_ReadReg	1
+../Core/Src/ov5640.c:73:10:OV5640_ReadID1	1
+../Core/Src/ov5640.c:112:9:OV5640_ReadID	3
+../Core/Src/ov5640.c:122:9:OV5640_Init	6
+../Core/Src/ov5640.c:192:6:OV5640_StartCapture	1
+../Core/Src/ov5640.c:206:6:OV5640_StopCapture	1

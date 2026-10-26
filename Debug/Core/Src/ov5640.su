@@ -6,4 +6,4 @@
 ../Core/Src/ov5640.c:112:9:OV5640_ReadID	24	static
 ../Core/Src/ov5640.c:122:9:OV5640_Init	32	static
 ../Core/Src/ov5640.c:192:6:OV5640_StartCapture	16	static
-../Core/Src/ov5640.c:206:6:OV5640_StopCapture	8	static
+../Core/Src/ov5640.c:202:6:OV5640_StopCapture	8	static
